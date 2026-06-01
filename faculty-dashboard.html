@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Faculty Dashboard | Palamuru University</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config={darkMode:"class",theme:{extend:{"colors":{"primary":"#001e40","primary-container":"#003366","on-primary":"#ffffff","on-primary-container":"#799dd6","primary-fixed":"#d5e3ff","primary-fixed-dim":"#a7c8ff","secondary":"#705d00","secondary-container":"#fcd400","on-secondary":"#ffffff","on-secondary-container":"#6e5c00","secondary-fixed":"#ffe16d","secondary-fixed-dim":"#e9c400","on-secondary-fixed":"#221b00","on-secondary-fixed-variant":"#544600","error":"#ba1a1a","error-container":"#ffdad6","on-error":"#ffffff","on-error-container":"#93000a","surface":"#f9f9ff","surface-dim":"#cfdaf1","surface-container-low":"#f0f3ff","surface-container":"#e7eeff","surface-container-high":"#dee8ff","surface-container-highest":"#d8e3fa","surface-container-lowest":"#ffffff","surface-variant":"#d8e3fa","on-surface":"#111c2c","on-surface-variant":"#43474f","background":"#f9f9ff","outline":"#737780","outline-variant":"#c3c6d1","surface-tint":"#3a5f94","inverse-primary":"#a7c8ff","inverse-surface":"#263142","inverse-on-surface":"#ebf1ff","on-primary-fixed":"#001b3c","on-primary-fixed-variant":"#1f477b","tertiary":"#1c1f20","tertiary-container":"#313435","on-tertiary":"#ffffff","on-tertiary-container":"#9a9c9d","tertiary-fixed":"#e1e3e4"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"fontFamily":{"display-lg":["Playfair Display"],"label-sm":["Outfit"],"label-md":["Outfit"],"body-lg":["Outfit"],"headline-lg":["Playfair Display"],"body-md":["Outfit"],"headline-md":["Playfair Display"]},"fontSize":{"display-lg":["48px",{"lineHeight":"1.2","letterSpacing":"-0.02em","fontWeight":"700"}],"label-sm":["12px",{"lineHeight":"1.2","fontWeight":"500"}],"label-md":["14px",{"lineHeight":"1.2","letterSpacing":"0.05em","fontWeight":"600"}],"body-lg":["18px",{"lineHeight":"1.6","fontWeight":"400"}],"headline-lg":["32px",{"lineHeight":"1.3","fontWeight":"700"}],"body-md":["16px",{"lineHeight":"1.6","fontWeight":"400"}],"headline-md":["24px",{"lineHeight":"1.4","fontWeight":"600"}]}}}}
+</script>
+<style>
+  .glass-card{background:rgba(255,255,255,.75);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.5)}
+  .university-shadow{box-shadow:0 20px 40px rgba(0,51,102,.08)}
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+  .nav-link{transition:all .25s ease}
+  .nav-link:hover{transform:translateX(3px)}
+  .nav-active{background:rgba(0,51,102,.12);color:#001e40;font-weight:600}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  @keyframes flashGreen{0%{background:rgba(34,197,94,.15)}100%{background:transparent}}
+  @keyframes flashRed{0%{background:rgba(186,26,26,.12)}100%{background:transparent}}
+  .fade-up{animation:fadeUp .45s cubic-bezier(.16,1,.3,1) forwards}
+  .skeleton{background:linear-gradient(90deg,#e7eeff 25%,#f0f3ff 50%,#e7eeff 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+  .flash-green{animation:flashGreen .6s ease-out}
+  .flash-red{animation:flashRed .6s ease-out}
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#c3c6d1;border-radius:10px}
+  /* Mark btn active states */
+  .mark-present.marked{background:#dcfce7;color:#15803d;border-color:#86efac}
+  .mark-absent.marked{background:#ffdad6;color:#ba1a1a;border-color:#fca5a5}
+  .mark-late.marked{background:#fef9c3;color:#854d0e;border-color:#fef08a}
+  /* Modal */
+  #modal-overlay{transition:opacity .3s ease}
+  #modal-box{transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s ease}
+</style>
+</head>
+<body class="bg-background font-body-md text-on-surface">
+<script src="js/api.js"></script>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface-container-low/85 backdrop-blur-md border-r border-outline-variant/30 py-6 z-50">
+  <div class="px-6 mb-8 flex items-center gap-3">
+    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center p-1 shadow-md border border-outline-variant/20">
+      <img alt="Logo" class="w-full h-full object-contain" src="images/02_palamuru_university_logo.png" onerror="this.style.display='none'"/>
+    </div>
+    <div>
+      <h2 class="font-display-lg text-headline-md text-primary leading-tight">Palamuru</h2>
+      <p class="font-outfit text-label-sm text-on-surface-variant">Faculty Portal</p>
+    </div>
+  </div>
+  <nav class="flex-1 space-y-1 px-2">
+    <a class="nav-link nav-active rounded-lg px-4 py-3 flex items-center gap-3 cursor-pointer" onclick="showSection('overview')">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">dashboard</span>
+      <span class="font-outfit text-label-md">Overview</span>
+    </a>
+    <a class="nav-link text-on-surface-variant hover:bg-surface-variant/50 rounded-lg px-4 py-3 flex items-center gap-3 cursor-pointer" onclick="showSection('attendance')">
+      <span class="material-symbols-outlined">how_to_reg</span>
+      <span class="font-outfit text-label-md">Mark Attendance</span>
+    </a>
+    <a class="nav-link text-on-surface-variant hover:bg-surface-variant/50 rounded-lg px-4 py-3 flex items-center gap-3 cursor-pointer" onclick="showSection('subjects')">
+      <span class="material-symbols-outlined">menu_book</span>
+      <span class="font-outfit text-label-md">My Subjects</span>
+    </a>
+    <a class="nav-link text-on-surface-variant hover:bg-surface-variant/50 rounded-lg px-4 py-3 flex items-center gap-3 cursor-pointer" onclick="showSection('students')">
+      <span class="material-symbols-outlined">groups</span>
+      <span class="font-outfit text-label-md">Students</span>
+    </a>
+    <a class="nav-link text-on-surface-variant hover:bg-surface-variant/50 rounded-lg px-4 py-3 flex items-center gap-3 cursor-pointer" onclick="showSection('reports')">
+      <span class="material-symbols-outlined">assessment</span>
+      <span class="font-outfit text-label-md">Reports</span>
+    </a>
+  </nav>
+  <div class="px-4 mt-auto border-t border-outline-variant pt-4">
+    <div class="glass-card rounded-xl p-4 flex items-center gap-3 university-shadow">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" id="sidebar-avatar" style="background:#003366">F</div>
+      <div class="min-w-0">
+        <p class="text-label-md font-bold text-primary truncate" id="sidebar-name">Loading…</p>
+        <p class="text-label-sm text-on-surface-variant truncate">Faculty Member</p>
+      </div>
+    </div>
+    <button onclick="PU.logout()" class="mt-3 w-full flex items-center gap-2 px-4 py-2 text-on-surface-variant hover:text-error hover:bg-error-container/30 rounded-lg transition-colors text-label-sm font-outfit">
+      <span class="material-symbols-outlined text-[18px]">logout</span> Sign Out
+    </button>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<main class="md:ml-64 min-h-screen" id="main-content">
+  <!-- Topbar -->
+  <header class="h-20 sticky top-0 z-40 flex items-center justify-between px-6 md:px-10 bg-surface/70 backdrop-blur-xl border-b border-white/40">
+    <div>
+      <h2 class="font-display-lg text-headline-md text-primary" id="section-title">Faculty Dashboard</h2>
+      <p class="font-outfit text-label-sm text-on-surface-variant uppercase tracking-widest" id="section-sub">Real-time attendance management</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="showSection('attendance')" class="hidden md:flex items-center gap-2 bg-primary text-on-primary px-5 py-2 rounded-lg font-bold text-label-md hover:bg-primary-container transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-95 border-b-2 border-secondary/0 hover:border-secondary">
+        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1">how_to_reg</span> Mark Attendance
+      </button>
+      <div class="h-8 w-[1px] bg-outline-variant mx-1"></div>
+      <span class="font-outfit text-label-sm font-bold hidden md:block" id="topbar-date">—</span>
+    </div>
+  </header>
+
+  <!-- ─── OVERVIEW ─── -->
+  <div id="sec-overview" class="p-6 md:p-10 max-w-[1400px] mx-auto">
+    <!-- Skeleton -->
+    <div id="overview-skeleton" class="space-y-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6"><div class="skeleton h-36 rounded-xl"></div><div class="skeleton h-36 rounded-xl"></div><div class="skeleton h-36 rounded-xl"></div></div>
+      <div class="skeleton h-80 rounded-xl"></div>
+    </div>
+    <!-- Content -->
+    <div id="overview-content" class="hidden space-y-8">
+      <!-- KPIs -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-6 rounded-xl university-shadow fade-up">
+          <div class="flex justify-between items-start mb-4">
+            <span class="p-2 bg-primary/10 rounded-lg"><span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">groups</span></span>
+            <span class="text-label-sm text-on-surface-variant font-bold uppercase tracking-wider">Total Students</span>
+          </div>
+          <h3 class="font-display-lg text-display-lg text-primary" id="kpi-students">—</h3>
+          <p class="text-label-sm text-on-surface-variant mt-2">enrolled across all subjects</p>
+        </div>
+        <div class="glass-card p-6 rounded-xl university-shadow fade-up" style="animation-delay:.1s">
+          <div class="flex justify-between items-start mb-4">
+            <span class="p-2 bg-secondary/10 rounded-lg"><span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1">menu_book</span></span>
+            <span class="text-label-sm text-on-surface-variant font-bold uppercase tracking-wider">My Subjects</span>
+          </div>
+          <h3 class="font-display-lg text-display-lg text-primary" id="kpi-subjects">—</h3>
+          <p class="text-label-sm text-on-surface-variant mt-2">active this semester</p>
+        </div>
+        <div class="glass-card p-6 rounded-xl university-shadow fade-up border-error/20" style="animation-delay:.2s">
+          <div class="flex justify-between items-start mb-4">
+            <span class="p-2 bg-error/10 rounded-lg"><span class="material-symbols-outlined text-error" style="font-variation-settings:'FILL' 1">warning</span></span>
+            <span class="text-label-sm text-on-surface-variant font-bold uppercase tracking-wider">Low Attendance</span>
+          </div>
+          <h3 class="font-display-lg text-display-lg text-error" id="kpi-low">—</h3>
+          <p class="text-label-sm text-error font-bold mt-2 cursor-pointer hover:underline" onclick="showSection('students')">View critical list →</p>
+        </div>
+      </div>
+
+      <!-- Subject Overview Cards -->
+      <div>
+        <h3 class="font-display-lg text-headline-md text-primary mb-5">Subject Overview</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="subject-overview-cards"></div>
+      </div>
+
+      <!-- Recent marks table -->
+      <div class="glass-card rounded-xl overflow-hidden university-shadow">
+        <div class="px-6 py-4 bg-surface-container-high flex justify-between items-center border-b border-white/40">
+          <h4 class="font-display-lg text-headline-md text-primary">Recent Attendance Marks</h4>
+          <button onclick="showSection('attendance')" class="text-primary text-label-md font-bold hover:underline">Mark New →</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-surface-container-low text-label-md text-on-surface-variant uppercase tracking-wider">
+              <tr>
+                <th class="px-6 py-3 font-bold">Student</th>
+                <th class="px-6 py-3 font-bold">Subject</th>
+                <th class="px-6 py-3 font-bold">Date</th>
+                <th class="px-6 py-3 font-bold text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="recent-marks-tbody" class="divide-y divide-surface-variant/30"></tbody>
+          </table>
+          <div id="recent-marks-empty" class="hidden py-14 text-center text-on-surface-variant">
+            <span class="material-symbols-outlined text-5xl mb-2">inbox</span><br/>No attendance records yet.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MARK ATTENDANCE ─── -->
+  <div id="sec-attendance" class="hidden p-6 md:p-10 max-w-[1400px] mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Left: student table -->
+      <section class="lg:col-span-8">
+        <div class="glass-card rounded-xl overflow-hidden university-shadow">
+          <div class="px-6 py-4 bg-surface-container-high border-b border-white/40">
+            <div class="mb-3">
+              <h4 class="font-display-lg text-headline-md text-primary">Class Roster</h4>
+              <p class="text-label-sm text-on-surface-variant mt-0.5">Step 1: Semester &rarr; Step 2: Branch &rarr; Step 3: Subject &rarr; Step 4: Mark</p>
+            </div>
+            <div class="flex flex-wrap gap-2 items-center">
+              <!-- Step 1: Semester -->
+              <div class="flex flex-col gap-0.5">
+                <span class="text-[9px] font-bold text-primary uppercase tracking-widest px-1">Semester</span>
+                <select id="att-semester" class="bg-primary text-white border border-primary rounded-lg px-3 py-2 font-outfit text-label-md focus:outline-none font-bold" onchange="filterSubjectsBySemester()">
+                  <option value="">— Select —</option>
+                  <option value="1">Semester 1</option>
+                  <option value="2">Semester 2</option>
+                  <option value="3">Semester 3</option>
+                  <option value="4">Semester 4</option>
+                  <option value="5">Semester 5</option>
+                  <option value="6">Semester 6</option>
+                  <option value="7">Semester 7</option>
+                  <option value="8">Semester 8</option>
+                </select>
+              </div>
+              <span class="text-primary font-bold text-lg mt-3">&rarr;</span>
+              <!-- Step 2: Branch / Department -->
+              <div class="flex flex-col gap-0.5">
+                <span class="text-[9px] font-bold text-secondary uppercase tracking-widest px-1">Branch</span>
+                <select id="att-branch" class="bg-secondary-container text-on-secondary-container border border-secondary-container rounded-lg px-3 py-2 font-outfit text-label-md focus:outline-none font-bold" onchange="filterRosterByBranch()">
+                  <option value="">All Branches</option>
+                </select>
+              </div>
+              <span class="text-primary font-bold text-lg mt-3">&rarr;</span>
+              <!-- Step 3: Subject (filtered by semester) -->
+              <div class="flex flex-col gap-0.5">
+                <span class="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest px-1">Subject</span>
+                <select id="att-subject" class="bg-white/60 backdrop-blur border border-outline-variant rounded-lg px-3 py-2 font-outfit text-label-md focus:outline-none focus:border-primary" onchange="loadRoster()">
+                  <option value="">— Pick Subject —</option>
+                </select>
+              </div>
+              <span class="text-primary font-bold text-lg mt-3">&rarr;</span>
+              <!-- Step 4: Date -->
+              <div class="flex flex-col gap-0.5">
+                <span class="text-[9px] font-bold text-on-surface-variant uppercase tracking-widest px-1">Date</span>
+                <input type="date" id="att-date" class="bg-white/60 backdrop-blur border border-outline-variant rounded-lg px-3 py-2 font-outfit text-label-md focus:outline-none focus:border-primary"/>
+              </div>
+            </div>
+          </div>
+          <!-- Bulk actions -->
+          <div class="px-6 py-3 bg-surface-container-low/60 border-b border-outline-variant/30 flex items-center gap-3 flex-wrap">
+            <button onclick="markAll('PRESENT')" class="flex items-center gap-1.5 px-4 py-1.5 bg-green-100 text-green-800 rounded-lg text-label-sm font-bold hover:bg-green-200 transition-colors">
+              <span class="material-symbols-outlined text-[16px]">done_all</span> All Present
+            </button>
+            <button onclick="markAll('ABSENT')" class="flex items-center gap-1.5 px-4 py-1.5 bg-error-container text-on-error-container rounded-lg text-label-sm font-bold hover:bg-error/20 transition-colors">
+              <span class="material-symbols-outlined text-[16px]">remove_done</span> All Absent
+            </button>
+            <button onclick="submitAttendance()" class="ml-auto flex items-center gap-1.5 px-5 py-2 bg-primary text-white rounded-lg text-label-md font-bold hover:bg-primary-container transition-all hover:shadow-lg active:scale-95">
+              <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1">cloud_upload</span> Save Attendance
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left">
+              <thead class="bg-surface-container-low text-label-md text-on-surface-variant uppercase tracking-wider">
+                <tr>
+                  <th class="px-6 py-3 font-bold">Student Name</th>
+                  <th class="px-6 py-3 font-bold">ID</th>
+                  <th class="px-6 py-3 font-bold">Branch</th>
+                  <th class="px-6 py-3 font-bold text-center">Attendance %</th>
+                  <th class="px-6 py-3 font-bold text-right">Quick Mark</th>
+                </tr>
+              </thead>
+              <tbody id="roster-tbody" class="divide-y divide-surface-variant/30"></tbody>
+            </table>
+            <div id="roster-empty" class="py-16 text-center text-on-surface-variant">
+              <span class="material-symbols-outlined text-5xl mb-2">person_search</span>
+              <p class="font-outfit mt-1" id="roster-empty-msg">Pick a semester, then a subject to load students.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: subject card + summary -->
+      <aside class="lg:col-span-4 space-y-6">
+        <div class="glass-card p-6 rounded-xl university-shadow" id="selected-subject-card">
+          <h5 class="font-display-lg text-headline-md text-primary mb-3">Session Info</h5>
+          <p class="text-on-surface-variant text-label-md" id="sel-sub-info">Pick a subject to see details.</p>
+          <div class="mt-4 space-y-2 hidden" id="sel-sub-stats">
+            <div class="flex justify-between text-label-md"><span>Total Students</span><span class="font-bold text-primary" id="ss-total">—</span></div>
+            <div class="flex justify-between text-label-md"><span>Marked Present</span><span class="font-bold text-green-700" id="ss-present">0</span></div>
+            <div class="flex justify-between text-label-md"><span>Marked Absent</span><span class="font-bold text-error" id="ss-absent">0</span></div>
+            <div class="flex justify-between text-label-md"><span>Unmarked</span><span class="font-bold text-on-surface-variant" id="ss-unmarked">—</span></div>
+          </div>
+        </div>
+        <div class="glass-card p-6 rounded-xl bg-primary text-on-primary university-shadow relative overflow-hidden group">
+          <div class="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-white pointer-events-none"></div>
+          <h5 class="font-display-lg text-headline-md text-white mb-3 relative z-10">Generate Reports</h5>
+          <p class="text-label-sm text-primary-fixed-dim mb-5 relative z-10">Download consolidated sheets for the current semester.</p>
+          <div class="space-y-3 relative z-10">
+            <button onclick="exportCSV()" class="w-full bg-secondary-container text-on-secondary-container font-bold py-3 px-4 rounded-lg flex items-center justify-between hover:scale-[1.02] active:scale-95 transition-transform">
+              <span>Export CSV</span><span class="material-symbols-outlined">table_chart</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ─── MY SUBJECTS ─── -->
+  <div id="sec-subjects" class="hidden p-6 md:p-10 max-w-[1400px] mx-auto">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+      <h3 class="font-display-lg text-headline-lg text-primary">My Subjects</h3>
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Semester filter pills -->
+        <div class="flex flex-wrap gap-2 items-center" id="fac-sub-sem-pills">
+          <span class="font-outfit text-label-sm text-on-surface-variant">Semester:</span>
+          <!-- Pills populated by JS -->
+        </div>
+        <button onclick="openSubjectModal()" class="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg font-bold text-label-md hover:bg-primary-container transition-all hover:shadow-lg active:scale-95">
+          <span class="material-symbols-outlined text-[18px]">add</span> Add Subject
+        </button>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="my-subjects-grid"></div>
+  </div>
+
+  <!-- ─── STUDENTS ─── -->
+  <div id="sec-students" class="hidden p-6 md:p-10 max-w-[1400px] mx-auto">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+      <h3 class="font-display-lg text-headline-lg text-primary">All Students</h3>
+      <div class="flex flex-wrap gap-3">
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+          <input id="student-search" type="text" placeholder="Search name or ID…" class="pl-10 pr-4 py-2 bg-surface-container border border-outline-variant rounded-lg font-outfit text-label-md focus:outline-none focus:border-primary" oninput="renderStudentsTable()"/>
+        </div>
+        <select id="student-dept-filter" class="bg-surface-container border border-outline-variant rounded-lg px-3 py-2 font-outfit text-label-md focus:outline-none focus:border-primary" onchange="renderStudentsTable()">
+          <option value="">All Departments</option>
+        </select>
+        <select id="student-sem-filter" class="bg-surface-container border border-outline-variant rounded-lg px-3 py-2 font-outfit text-label-md focus:outline-none focus:border-primary" onchange="renderStudentsTable()">
+          <option value="">All Semesters</option>
+        </select>
+        <button onclick="openStudentModal()" class="flex items-center gap-2 bg-primary text-white px-5 py-2 rounded-lg font-bold text-label-md hover:bg-primary-container transition-all hover:shadow-lg active:scale-95">
+          <span class="material-symbols-outlined text-[18px]">person_add</span> Add Student
+        </button>
+      </div>
+    </div>
+    <div class="glass-card rounded-xl overflow-hidden university-shadow">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="bg-surface-container-high">
+            <tr class="text-label-md text-on-surface-variant uppercase tracking-wider">
+              <th class="px-6 py-4 font-bold">Student</th>
+              <th class="px-6 py-4 font-bold">ID</th>
+              <th class="px-6 py-4 font-bold">Department</th>
+              <th class="px-6 py-4 font-bold text-center">Semester</th>
+              <th class="px-6 py-4 font-bold text-center">Attendance %</th>
+              <th class="px-6 py-4 font-bold text-center">Status</th>
+              <th class="px-6 py-4 font-bold text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="students-tbody" class="divide-y divide-surface-variant/30"></tbody>
+        </table>
+        <div id="students-empty" class="hidden py-14 text-center text-on-surface-variant">
+          <span class="material-symbols-outlined text-5xl">manage_accounts</span>
+          <p class="mt-2 font-outfit">No students found.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── REPORTS ─── -->
+  <div id="sec-reports" class="hidden p-6 md:p-10 max-w-[1400px] mx-auto">
+    <h3 class="font-display-lg text-headline-lg text-primary mb-8">Reports &amp; Analytics</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Per-subject report -->
+      <div class="glass-card rounded-2xl p-6 university-shadow">
+        <h4 class="font-display-lg text-headline-md text-primary mb-5">Subject-wise Summary</h4>
+        <div id="report-subjects" class="space-y-4"></div>
+      </div>
+      <!-- Low attendance students -->
+      <div class="glass-card rounded-2xl p-6 university-shadow">
+        <h4 class="font-display-lg text-headline-md text-error mb-1">⚠ Low Attendance Students</h4>
+        <p class="text-label-sm text-on-surface-variant mb-5">Students below 75% overall.</p>
+        <div id="report-low-students" class="space-y-3"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ─── Mobile Bottom Nav ─── -->
+<div class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container-low/95 backdrop-blur-md border-t border-outline-variant flex justify-around py-3 z-50">
+  <button onclick="showSection('overview')"   class="flex flex-col items-center gap-0.5 text-primary"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">dashboard</span><span class="text-[9px] font-bold">Home</span></button>
+  <button onclick="showSection('attendance')" class="flex flex-col items-center gap-0.5 text-on-surface-variant"><span class="material-symbols-outlined">how_to_reg</span><span class="text-[9px] font-bold">Mark</span></button>
+  <button onclick="showSection('subjects')"   class="flex flex-col items-center gap-0.5 text-on-surface-variant"><span class="material-symbols-outlined">menu_book</span><span class="text-[9px] font-bold">Subjects</span></button>
+  <button onclick="showSection('students')"   class="flex flex-col items-center gap-0.5 text-on-surface-variant"><span class="material-symbols-outlined">groups</span><span class="text-[9px] font-bold">Students</span></button>
+  <button onclick="showSection('reports')"    class="flex flex-col items-center gap-0.5 text-on-surface-variant"><span class="material-symbols-outlined">assessment</span><span class="text-[9px] font-bold">Reports</span></button>
+</div>
+
+<!-- ─── Add/Edit Subject Modal ─── -->
+<div id="modal-overlay" class="fixed inset-0 z-[100] bg-primary/40 backdrop-blur-sm flex items-center justify-center hidden" onclick="closeSubjectModal(event)">
+  <div id="modal-box" class="glass-card rounded-2xl p-8 w-full max-w-md mx-4 university-shadow" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="font-display-lg text-headline-md text-primary" id="modal-title">Add Subject</h3>
+      <button onclick="closeSubjectModal()" class="text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form id="subject-form" class="space-y-5" onsubmit="saveSubject(event)">
+      <input type="hidden" id="subject-edit-id"/>
+      <div>
+        <label class="block text-label-sm text-on-surface-variant mb-1">Subject Name *</label>
+        <input type="text" id="sub-name" required placeholder="e.g. Data Structures" class="w-full border-b-2 border-primary bg-transparent py-2 font-outfit focus:outline-none focus:border-surface-tint placeholder:text-outline-variant"/>
+      </div>
+      <div>
+        <label class="block text-label-sm text-on-surface-variant mb-1">Subject Code *</label>
+        <input type="text" id="sub-code" required placeholder="e.g. CS-402" class="w-full border-b-2 border-primary bg-transparent py-2 font-outfit focus:outline-none focus:border-surface-tint placeholder:text-outline-variant"/>
+      </div>
+      <div>
+        <label class="block text-label-sm text-on-surface-variant mb-1">Semester *</label>
+        <input type="number" id="sub-semester" required min="1" max="8" placeholder="e.g. 4" class="w-full border-b-2 border-primary bg-transparent py-2 font-outfit focus:outline-none focus:border-surface-tint placeholder:text-outline-variant"/>
+      </div>
+      <div id="modal-error" class="hidden p-3 bg-error-container text-on-error-container rounded-lg text-sm"></div>
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="closeSubjectModal()" class="flex-1 py-3 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold hover:bg-surface-container transition-colors">Cancel</button>
+        <button type="submit" id="modal-save-btn" class="flex-1 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-container transition-all active:scale-95">Save Subject</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ─── Add/Edit Student Modal ─── -->
+<div id="student-modal-overlay" class="fixed inset-0 z-[100] bg-primary/40 backdrop-blur-sm flex items-center justify-center hidden" onclick="closeStudentModal(event)">
+  <div id="student-modal-box" class="glass-card rounded-2xl p-8 w-full max-w-md mx-4 university-shadow" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="font-display-lg text-headline-md text-primary" id="student-modal-title">Add Student</h3>
+      <button onclick="closeStudentModal()" class="text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form id="student-form" class="space-y-4" onsubmit="saveStudent(event)">
+      <input type="hidden" id="student-edit-id"/>
+      <div>
+        <label class="block text-label-sm text-on-surface-variant mb-1">Full Name *</label>
+        <input type="text" id="stud-name" required placeholder="e.g. Rahul Sharma" class="w-full border-b-2 border-primary bg-transparent py-1.5 font-outfit focus:outline-none focus:border-surface-tint placeholder:text-outline-variant"/>
+      </div>
+      <div>
+        <label class="block text-label-sm text-on-surface-variant mb-1">Email Address *</label>
+        <input type="email" id="stud-email" required placeholder="e.g. rahul@palamuru.edu" class="w-full border-b-2 border-primary bg-transparent py-1.5 font-outfit focus:outline-none focus:border-surface-tint placeholder:text-outline-variant"/>
+      </div>
+      <div id="stud-password-group">
+        <label class="block text-label-sm text-on-surface-variant mb-1">Password (Defaults to password123 if blank)</label>
+        <input type="password" id="stud-password" placeholder="Leave blank for default" class="w-full border-b-2 border-primary bg-transparent py-1.5 font-outfit focus:outline-none focus:border-surface-tint placeholder:text-outline-variant"/>
+      </div>
+      <div>
+        <label class="block text-label-sm text-on-surface-variant mb-1">Phone Number</label>
+        <input type="text" id="stud-phone" placeholder="e.g. +91 98765 43210" class="w-full border-b-2 border-primary bg-transparent py-1.5 font-outfit focus:outline-none focus:border-surface-tint placeholder:text-outline-variant"/>
+      </div>
+      <div>
+        <label class="block text-label-sm text-on-surface-variant mb-1">Student Unique ID *</label>
+        <input type="text" id="stud-unique-id" required placeholder="e.g. PU-2023-CS-042" class="w-full border-b-2 border-primary bg-transparent py-1.5 font-outfit focus:outline-none focus:border-surface-tint placeholder:text-outline-variant"/>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-label-sm text-on-surface-variant mb-1">Department *</label>
+          <select id="stud-dept" required class="w-full border-b-2 border-primary bg-transparent py-1.5 font-outfit focus:outline-none focus:border-surface-tint">
+            <option value="Computer Science">Computer Science</option>
+            <option value="Data Science">Data Science</option>
+            <option value="AIML">AIML</option>
+            <option value="CSE">CSE</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-label-sm text-on-surface-variant mb-1">Semester *</label>
+          <select id="stud-semester" required class="w-full border-b-2 border-primary bg-transparent py-1.5 font-outfit focus:outline-none focus:border-surface-tint">
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            <option value="3">Semester 3</option>
+            <option value="4">Semester 4</option>
+            <option value="5">Semester 5</option>
+            <option value="6" selected>Semester 6</option>
+            <option value="7">Semester 7</option>
+            <option value="8">Semester 8</option>
+          </select>
+        </div>
+      </div>
+      <div id="student-modal-error" class="hidden p-3 bg-error-container text-on-error-container rounded-lg text-xs font-semibold"></div>
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="closeStudentModal()" class="flex-1 py-3 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold hover:bg-surface-container transition-colors">Cancel</button>
+        <button type="submit" id="student-modal-save-btn" class="flex-1 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-container transition-all active:scale-95">Save Student</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// ── Guard ──────────────────────────────────────────────────────────────────
+if (!PU.requireAuth(['FACULTY','ADMIN'])) { /* redirected */ }
+
+// ── State ──────────────────────────────────────────────────────────────────
+let allStudents   = [];
+let mySubjects    = [];
+let allAttendance = {};    // subjectId → [records]
+let rosterMarks   = {};    // studentId → status string | null
+let facultySemFilter = ''; // active semester pill in My Subjects
+
+// ── Boot ───────────────────────────────────────────────────────────────────
+(async function boot() {
+  const user = PU.getUser();
+  document.getElementById('sidebar-name').textContent = user.name;
+  document.getElementById('topbar-date').textContent  = new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+  const av = document.getElementById('sidebar-avatar');
+  av.textContent = PU.initials(user.name);
+  av.style.background = PU.avatarColor(user.name);
+  document.getElementById('att-date').value = new Date().toISOString().slice(0,10);
+
+  try {
+    [allStudents, mySubjects] = await Promise.all([PU.getStudents(), PU.getSubjects()]);
+
+    // Prefetch attendance for each subject
+    await Promise.all(mySubjects.map(async s => {
+      try { allAttendance[s.id] = await PU.getAttendanceBySubject(s.id); }
+      catch { allAttendance[s.id] = []; }
+    }));
+
+    renderOverview();
+    renderSubjectsGrid();
+    renderStudentsTable();
+    renderAttendanceSection();
+    renderReports();
+    buildFacultySemPills();
+
+    document.getElementById('overview-skeleton').classList.add('hidden');
+    document.getElementById('overview-content').classList.remove('hidden');
+  } catch(e) {
+    PU.toast(e.message || 'Failed to load dashboard', 'error');
+  }
+})();
+
+// ── Section switcher ───────────────────────────────────────────────────────
+function showSection(name) {
+  ['overview','attendance','subjects','students','reports'].forEach(s =>
+    document.getElementById(`sec-${s}`).classList.add('hidden'));
+  document.getElementById(`sec-${name}`).classList.remove('hidden');
+
+  const labels = {overview:'Faculty Dashboard',attendance:'Mark Attendance',subjects:'My Subjects',students:'All Students',reports:'Reports & Analytics'};
+  document.getElementById('section-title').textContent = labels[name];
+  document.getElementById('section-sub').textContent   = {
+    overview:'Real-time attendance management', attendance:'Select subject & date, then mark',
+    subjects:'Manage your subject list', students:'All enrolled students',
+    reports:'Attendance analytics & exports'
+  }[name];
+
+  document.querySelectorAll('#sidebar .nav-link').forEach(el => { el.classList.remove('nav-active'); el.classList.add('text-on-surface-variant'); });
+  const idx = {overview:0,attendance:1,subjects:2,students:3,reports:4}[name];
+  const links = document.querySelectorAll('#sidebar .nav-link');
+  if (links[idx]) { links[idx].classList.add('nav-active'); links[idx].classList.remove('text-on-surface-variant'); }
+}
+
+// ── Render: Overview ───────────────────────────────────────────────────────
+function renderOverview() {
+  document.getElementById('kpi-students').textContent = allStudents.length;
+  document.getElementById('kpi-subjects').textContent = mySubjects.length;
+
+  const lowCount = allStudents.filter(s => s.attendancePercentage < 75).length;
+  document.getElementById('kpi-low').textContent = lowCount;
+
+  // Subject overview cards
+  const grid = document.getElementById('subject-overview-cards');
+  grid.innerHTML = mySubjects.map(s => {
+    const recs   = allAttendance[s.id] || [];
+    const unique = [...new Set(recs.map(r => r.student?.id))].length;
+    const avg    = unique ? Math.round(recs.filter(r=>r.status==='PRESENT').length / recs.length * 100) : 0;
+    return `
+    <div class="glass-card rounded-xl p-5 university-shadow hover:-translate-y-1 transition-all cursor-pointer fade-up" onclick="showSection('attendance')">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h4 class="font-bold text-primary font-outfit">${s.name}</h4>
+          <p class="text-label-sm text-on-surface-variant">${s.code} · Sem ${s.semester}</p>
+        </div>
+        <span class="material-symbols-outlined text-primary/40">menu_book</span>
+      </div>
+      <div class="flex justify-between text-label-md mb-3">
+        <span>Avg. Attendance</span>
+        <span class="font-bold" style="color:${PU.progressColor(avg)}">${recs.length ? avg+'%' : 'N/A'}</span>
+      </div>
+      <div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+        <div class="h-full rounded-full" style="width:${avg}%;background:${PU.progressColor(avg)};transition:width 1s ease"></div>
+      </div>
+      <p class="text-[11px] text-on-surface-variant mt-3">${recs.length} total records</p>
+    </div>`;
+  }).join('') || '<p class="text-on-surface-variant">No subjects found. Add one above.</p>';
+
+  // Recent marks table
+  const allRecs = Object.values(allAttendance).flat().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,10);
+  const tbody = document.getElementById('recent-marks-tbody');
+  if (!allRecs.length) {
+    document.getElementById('recent-marks-empty').classList.remove('hidden');
+  } else {
+    const badges = { PRESENT:'bg-secondary-container text-on-secondary-container', ABSENT:'bg-error-container text-on-error-container', LATE:'bg-yellow-100 text-yellow-800' };
+    tbody.innerHTML = allRecs.map(r => `
+    <tr class="hover:bg-primary-container/5 transition-colors">
+      <td class="px-6 py-3">
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0" style="background:${PU.avatarColor(r.student?.user?.name||'?')}">${PU.initials(r.student?.user?.name||'?')}</div>
+          <span class="font-medium text-label-md">${r.student?.user?.name || '—'}</span>
+        </div>
+      </td>
+      <td class="px-6 py-3 text-label-md">${r.subject?.name||'—'}</td>
+      <td class="px-6 py-3 text-label-md text-on-surface-variant">${PU.formatDate(r.date)}</td>
+      <td class="px-6 py-3 text-center"><span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${badges[r.status]||''}">${r.status}</span></td>
+    </tr>`).join('');
+  }
+}
+
+// ── Render: Attendance section ─────────────────────────────────────────────
+function renderAttendanceSection() {
+  // Populate semester dropdown — highlight only semesters that have subjects
+  const existingSems = [...new Set(mySubjects.map(s => s.semester))].sort((a,b) => a-b);
+  const semSel = document.getElementById('att-semester');
+  semSel.innerHTML = '<option value="">— Select —</option>';
+  for (let i = 1; i <= 8; i++) {
+    const opt = new Option(`Semester ${i}`, String(i));
+    if (!existingSems.includes(i)) opt.disabled = true;
+    semSel.add(opt);
+  }
+  // Reset branch and subject dropdowns
+  document.getElementById('att-branch').innerHTML = '<option value="">All Branches</option>';
+  document.getElementById('att-subject').innerHTML = '<option value="">— Pick Subject —</option>';
+}
+
+function filterSubjectsBySemester() {
+  const sem = Number(document.getElementById('att-semester').value);
+  const subSel    = document.getElementById('att-subject');
+  const branchSel = document.getElementById('att-branch');
+
+  // Clear roster
+  document.getElementById('roster-tbody').innerHTML = '';
+  document.getElementById('roster-empty').classList.remove('hidden');
+  document.getElementById('sel-sub-stats').classList.add('hidden');
+  document.getElementById('sel-sub-info').textContent = sem
+    ? `Semester ${sem} — Pick a branch & subject below.`
+    : 'Pick a semester to see details.';
+  Object.keys(rosterMarks).forEach(k => delete rosterMarks[k]);
+
+  // Reset branch & subject dropdowns
+  branchSel.innerHTML = '<option value="">All Branches</option>';
+  subSel.innerHTML    = '<option value="">— Pick Subject —</option>';
+  if (!sem) return;
+
+  // Populate Branch dropdown from students in this semester
+  const branchesInSem = [...new Set(
+    allStudents.filter(st => st.semester === sem).map(st => st.department)
+  )].sort();
+  branchesInSem.forEach(b => branchSel.add(new Option(b, b)));
+
+  // Populate subject dropdown for this semester
+  const filtered = mySubjects.filter(s => s.semester === sem);
+  filtered.forEach(s => subSel.add(new Option(`${s.name} (${s.code})`, s.id)));
+
+  const emptyMsg = document.getElementById('roster-empty-msg');
+  if (emptyMsg) emptyMsg.textContent = filtered.length
+    ? 'Pick a branch (optional) and a subject above to load students.'
+    : `No subjects found for Semester ${sem}.`;
+}
+
+function filterRosterByBranch() {
+  // Just re-render the roster with current subject + new branch filter
+  if (document.getElementById('att-subject').value) loadRoster();
+  else {
+    // No subject yet — just update the empty message
+    const branch = document.getElementById('att-branch').value;
+    const emptyMsg = document.getElementById('roster-empty-msg');
+    if (emptyMsg) emptyMsg.textContent = branch
+      ? `Branch set to ${branch}. Now pick a subject.`
+      : 'Pick a subject above to load students.';
+  }
+}
+
+async function loadRoster() {
+  const subId  = document.getElementById('att-subject').value;
+  const branch = document.getElementById('att-branch')?.value || '';
+  const tbody  = document.getElementById('roster-tbody');
+  const empty  = document.getElementById('roster-empty');
+  const stats  = document.getElementById('sel-sub-stats');
+
+  Object.keys(rosterMarks).forEach(k => delete rosterMarks[k]);
+
+  if (!subId) { tbody.innerHTML=''; empty.classList.remove('hidden'); stats.classList.add('hidden'); return; }
+
+  // Re-fetch students and attendance records
+  try {
+    const [students, recs] = await Promise.all([
+      PU.getStudents(),
+      PU.getAttendanceBySubject(subId)
+    ]);
+    allStudents = students;
+    allAttendance[subId] = recs;
+  } catch (e) {
+    console.error('Failed to pre-fetch roster data:', e);
+  }
+
+  const subject = mySubjects.find(s => s.id === subId);
+  const recs    = allAttendance[subId] || [];
+
+  // Per-student attendance %
+  const studentStats = {};
+  for (const r of recs) {
+    const sid = r.student?.id; if (!sid) continue;
+    if (!studentStats[sid]) studentStats[sid] = { total:0, present:0 };
+    studentStats[sid].total++;
+    if (r.status==='PRESENT'||r.status==='LATE') studentStats[sid].present++;
+  }
+
+  // Filter: same semester as subject, and optionally filter by branch
+  let rosterStudents = allStudents.filter(st => st.semester === subject.semester);
+  if (branch) rosterStudents = rosterStudents.filter(st => st.department === branch);
+
+  document.getElementById('sel-sub-info').textContent =
+    `${subject?.name} — Sem ${subject?.semester}${branch ? ' · ' + branch : ''}`;
+  document.getElementById('ss-total').textContent = rosterStudents.length;
+  stats.classList.remove('hidden');
+  updateSessionStats();
+
+  if (!rosterStudents.length) {
+    empty.classList.remove('hidden');
+    const emptyMsg = document.getElementById('roster-empty-msg');
+    if (emptyMsg) emptyMsg.textContent = branch
+      ? `No students in Semester ${subject.semester} for branch "${branch}".`
+      : `No students found in Semester ${subject.semester}.`;
+    return;
+  }
+
+  empty.classList.add('hidden');
+  tbody.innerHTML = rosterStudents.map(st => {
+    const ss  = studentStats[st.id] || { total:0, present:0 };
+    const pct = ss.total ? Math.round(ss.present/ss.total*100) : 0;
+    rosterMarks[st.id] = null;
+    // Department badge colour (cycle through a few colours)
+    const deptColors = ['bg-blue-100 text-blue-800','bg-purple-100 text-purple-800','bg-green-100 text-green-800','bg-amber-100 text-amber-800','bg-rose-100 text-rose-800','bg-cyan-100 text-cyan-800','bg-indigo-100 text-indigo-800'];
+    const deptHash = (st.department||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+    const deptBadge = deptColors[deptHash % deptColors.length];
+    return `
+    <tr class="hover:bg-primary-container/5 transition-colors" id="row-${st.id}">
+      <td class="px-6 py-3">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background:${PU.avatarColor(st.user?.name||'?')}">${PU.initials(st.user?.name||'?')}</div>
+          <span class="font-medium">${st.user?.name || '—'}</span>
+        </div>
+      </td>
+      <td class="px-6 py-3 font-mono text-label-md">${st.studentUniqueId}</td>
+      <td class="px-6 py-3">
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${deptBadge}">${st.department}</span>
+      </td>
+      <td class="px-6 py-3">
+        <div class="flex items-center gap-2 justify-center">
+          <div class="w-16 bg-surface-variant rounded-full h-1.5"><div class="h-1.5 rounded-full" style="width:${pct}%;background:${PU.progressColor(pct)}"></div></div>
+          <span class="text-label-sm font-bold" style="color:${PU.progressColor(pct)}">${ss.total?pct+'%':'—'}</span>
+        </div>
+      </td>
+      <td class="px-6 py-3 text-right">
+        <div class="flex justify-end gap-2">
+          <button class="mark-present px-3 py-1.5 bg-surface-container-low text-on-surface-variant rounded-lg text-label-sm font-bold border border-outline-variant hover:bg-green-100 hover:text-green-800 transition-colors" onclick="markStudent('${st.id}','PRESENT',this,'${st.id}')">Present</button>
+          <button class="mark-absent px-3 py-1.5 bg-surface-container-low text-on-surface-variant rounded-lg text-label-sm font-bold border border-outline-variant hover:bg-red-100 hover:text-red-800 transition-colors" onclick="markStudent('${st.id}','ABSENT',this,'${st.id}')">Absent</button>
+          <button class="mark-late px-3 py-1.5 bg-surface-container-low text-on-surface-variant rounded-lg text-label-sm font-bold border border-outline-variant hover:bg-yellow-100 hover:text-yellow-800 transition-colors" onclick="markStudent('${st.id}','LATE',this,'${st.id}')">Late</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function markStudent(studentId, status, btn, rowStudentId) {
+  rosterMarks[studentId] = status;
+  const row = document.getElementById(`row-${rowStudentId}`);
+  row.classList.remove('flash-green','flash-red');
+  void row.offsetWidth;
+  row.classList.add(status==='PRESENT'?'flash-green':'flash-red');
+
+  const btns = btn.closest('td').querySelectorAll('button');
+  btns.forEach(b => b.classList.remove('marked','bg-green-100','text-green-800','bg-red-100','text-red-800','bg-yellow-100','text-yellow-800'));
+  btn.classList.add('marked');
+  if (status==='PRESENT') btn.classList.add('bg-green-100','text-green-800');
+  else if (status==='ABSENT') btn.classList.add('bg-red-100','text-red-800');
+  else btn.classList.add('bg-yellow-100','text-yellow-800');
+  updateSessionStats();
+}
+
+function markAll(status) {
+  const subId = document.getElementById('att-subject').value;
+  if (!subId) return;
+  const branch = document.getElementById('att-branch')?.value || '';
+  const subject = mySubjects.find(s => s.id === subId);
+
+  let rosterStudents = allStudents.filter(st => st.semester === subject.semester);
+  if (branch) rosterStudents = rosterStudents.filter(st => st.department === branch);
+
+  rosterStudents.forEach(st => {
+    rosterMarks[st.id] = status;
+    const row = document.getElementById(`row-${st.id}`);
+    if (!row) return;
+    row.classList.remove('flash-green','flash-red');
+    void row.offsetWidth;
+    row.classList.add(status==='PRESENT'?'flash-green':'flash-red');
+    const btns = row.querySelectorAll('td:last-child button');
+    btns.forEach(b => b.classList.remove('marked','bg-green-100','text-green-800','bg-red-100','text-red-800','bg-yellow-100','text-yellow-800'));
+    if (status==='PRESENT') btns[0].classList.add('marked','bg-green-100','text-green-800');
+    else if (status==='ABSENT') btns[1].classList.add('marked','bg-red-100','text-red-800');
+  });
+  updateSessionStats();
+  PU.toast(`All ${branch ? branch + ' ' : ''}students marked as ${status}`, 'info');
+}
+
+function updateSessionStats() {
+  const marks = Object.values(rosterMarks);
+  document.getElementById('ss-present').textContent  = marks.filter(m=>m==='PRESENT').length;
+  document.getElementById('ss-absent').textContent   = marks.filter(m=>m==='ABSENT').length;
+  document.getElementById('ss-unmarked').textContent = marks.filter(m=>!m).length;
+}
+
+async function submitAttendance() {
+  const subId = document.getElementById('att-subject').value;
+  const date  = document.getElementById('att-date').value;
+  if (!subId) { PU.toast('Please select a subject first.','warning'); return; }
+  if (!date)  { PU.toast('Please select a date.','warning'); return; }
+
+  const toMark = Object.entries(rosterMarks).filter(([,s])=>s);
+  if (!toMark.length) { PU.toast('No students marked yet.','warning'); return; }
+
+  const btn = document.querySelector('button[onclick="submitAttendance()"]');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  let saved = 0, errors = 0;
+  for (const [studentId, status] of toMark) {
+    try {
+      await PU.markAttendance({ studentId, subjectId: subId, date: new Date(date).toISOString(), status });
+      saved++;
+    } catch { errors++; }
+  }
+
+  // Refresh all state data
+  try {
+    [allStudents, allAttendance[subId]] = await Promise.all([
+      PU.getStudents(),
+      PU.getAttendanceBySubject(subId)
+    ]);
+  } catch(e) {
+    console.error('Failed to refresh data after save:', e);
+  }
+
+  btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined text-[18px]" style="font-variation-settings:\'FILL\' 1">cloud_upload</span> Save Attendance';
+  PU.toast(`${saved} records saved${errors?`, ${errors} failed`:''}!`, errors?'warning':'success');
+  if (saved) {
+    renderOverview();
+    renderReports();
+    renderStudentsTable();
+    loadRoster();
+  }
+}
+
+// ── Render: Subjects grid ──────────────────────────────────────────────────
+function renderSubjectsGrid() {
+  let subjects = mySubjects;
+  if (facultySemFilter) subjects = subjects.filter(s => String(s.semester) === facultySemFilter);
+  const grid = document.getElementById('my-subjects-grid');
+  grid.innerHTML = subjects.map(s => `
+  <div class="glass-card rounded-2xl p-6 university-shadow hover:-translate-y-1 transition-all group">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <h4 class="font-display-lg text-headline-md text-primary">${s.name}</h4>
+        <p class="text-on-surface-variant text-label-sm mt-1">${s.code} &bull; Semester ${s.semester}</p>
+      </div>
+      <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button onclick="editSubject('${s.id}')" class="p-1.5 rounded-lg hover:bg-surface-container transition-colors text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+        <button onclick="deleteSubject('${s.id}')" class="p-1.5 rounded-lg hover:bg-error-container transition-colors text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+      </div>
+    </div>
+    <div class="space-y-2 text-label-md">
+      <div class="flex justify-between"><span>Records</span><span class="font-bold text-primary">${(allAttendance[s.id]||[]).length}</span></div>
+    </div>
+    <button onclick="showSection('attendance');document.getElementById('att-semester').value='${s.semester}';filterSubjectsBySemester();document.getElementById('att-subject').value='${s.id}';loadRoster()" class="mt-4 w-full py-2 rounded-lg bg-surface-container text-primary font-bold text-label-sm hover:bg-primary-container hover:text-white transition-all">
+      Take Attendance
+    </button>
+  </div>`).join('') || `
+  <div class="col-span-full text-center py-16 text-on-surface-variant">
+    <span class="material-symbols-outlined text-5xl mb-2">menu_book</span>
+    <p class="font-outfit">No subjects yet. Click "Add Subject" to get started.</p>
+  </div>`;
+}
+
+// ── Faculty semester pills (My Subjects section) ───────────────────────────────
+function buildFacultySemPills() {
+  const semsWithSubjects = new Set(mySubjects.map(s => String(s.semester)));
+  const allSems = ['', '1','2','3','4','5','6','7','8'];
+  const container = document.getElementById('fac-sub-sem-pills');
+  container.querySelectorAll('button').forEach(b => b.remove());
+  // Populate the students semester filter dropdown
+  const semSel = document.getElementById('student-sem-filter');
+  if (semSel) {
+    semSel.innerHTML = '<option value="">All Semesters</option>';
+    for (let i = 1; i <= 8; i++) semSel.add(new Option(`Semester ${i}`, String(i)));
+  }
+  allSems.forEach(sem => {
+    const btn = document.createElement('button');
+    btn.textContent = sem === '' ? 'All' : `Sem ${sem}`;
+    btn.dataset.sem = sem;
+    const isActive = facultySemFilter === sem;
+    const hasData = sem === '' || semsWithSubjects.has(sem);
+    btn.disabled = !hasData;
+    btn.className = `px-3 py-1 rounded-full text-label-sm font-bold transition-all border ${
+      isActive
+        ? 'bg-primary text-white border-primary shadow-md'
+        : hasData
+          ? 'bg-surface-container text-on-surface-variant border-outline-variant hover:border-primary hover:text-primary'
+          : 'bg-surface-container/40 text-on-surface-variant/30 border-outline-variant/30 cursor-not-allowed'
+    }`;
+    btn.onclick = () => {
+      if (!hasData) return;
+      facultySemFilter = sem;
+      buildFacultySemPills();
+      renderSubjectsGrid();
+    };
+    container.appendChild(btn);
+  });
+}
+
+// ── Render: Students table ─────────────────────────────────────────────────
+function renderStudentsTable() {
+  const q    = (document.getElementById('student-search')?.value||'').toLowerCase();
+  const dept = document.getElementById('student-dept-filter')?.value||'';
+  const sem  = document.getElementById('student-sem-filter')?.value||'';
+
+  // Populate dept filter
+  const deptSel = document.getElementById('student-dept-filter');
+  if (deptSel.options.length === 1) {
+    [...new Set(allStudents.map(s=>s.department))].sort().forEach(d => deptSel.add(new Option(d,d)));
+  }
+
+  let filtered = allStudents;
+  if (q)    filtered = filtered.filter(s=>(s.user?.name||'').toLowerCase().includes(q)||(s.studentUniqueId||'').toLowerCase().includes(q));
+  if (dept) filtered = filtered.filter(s=>s.department===dept);
+  if (sem)  filtered = filtered.filter(s=>String(s.semester)===sem);
+
+  const tbody = document.getElementById('students-tbody');
+  const empty = document.getElementById('students-empty');
+  if (!filtered.length) { tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+
+  tbody.innerHTML = filtered.map(s => {
+    const pct = s.attendancePercentage;
+    const badge = PU.attendanceBadge(pct);
+    return `
+    <tr class="hover:bg-primary-container/5 transition-colors">
+      <td class="px-6 py-3">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background:${PU.avatarColor(s.user?.name||'?')}">${PU.initials(s.user?.name||'?')}</div>
+          <div>
+            <p class="font-medium text-on-surface">${s.user?.name||'—'}</p>
+            <p class="text-[11px] text-on-surface-variant">${s.user?.email||''}</p>
+          </div>
+        </div>
+      </td>
+      <td class="px-6 py-3 font-mono text-label-md">${s.studentUniqueId}</td>
+      <td class="px-6 py-3 text-label-md">${s.department}</td>
+      <td class="px-6 py-3 text-label-md text-center">${s.semester}</td>
+      <td class="px-6 py-3">
+        <div class="flex items-center gap-2 justify-center">
+          <div class="w-16 bg-surface-variant rounded-full h-1.5"><div class="h-1.5 rounded-full" style="width:${pct}%;background:${PU.progressColor(pct)}"></div></div>
+          <span class="text-label-sm font-bold" style="color:${PU.progressColor(pct)}">${pct}%</span>
+        </div>
+      </td>
+      <td class="px-6 py-3 text-center"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${badge.cls}">${badge.label}</span></td>
+      <td class="px-6 py-3 text-right">
+        <div class="flex justify-end gap-2">
+          <button onclick="editStudent('${s.id}')" class="p-1.5 rounded-lg hover:bg-surface-container transition-colors text-on-surface-variant hover:text-primary" title="Edit Student">
+            <span class="material-symbols-outlined text-[18px]">edit</span>
+          </button>
+          <button onclick="deleteStudent('${s.id}')" class="p-1.5 rounded-lg hover:bg-error-container transition-colors text-on-surface-variant hover:text-error" title="Delete Student">
+            <span class="material-symbols-outlined text-[18px]">delete</span>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Render: Reports ───────────────────────────────────────────────────────
+function renderReports() {
+  const repSub = document.getElementById('report-subjects');
+  repSub.innerHTML = mySubjects.map(s => {
+    const recs = allAttendance[s.id]||[];
+    const total = recs.length;
+    const present = recs.filter(r=>r.status==='PRESENT').length;
+    const pct = total ? Math.round(present/total*100) : 0;
+    return `
+    <div class="flex items-center gap-4">
+      <div class="flex-grow">
+        <div class="flex justify-between text-label-md mb-1">
+          <span class="font-bold">${s.name}</span>
+          <span style="color:${PU.progressColor(pct)}" class="font-bold">${total?pct+'%':'N/A'}</span>
+        </div>
+        <div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+          <div class="h-full rounded-full" style="width:${pct}%;background:${PU.progressColor(pct)};transition:width 1s ease"></div>
+        </div>
+        <p class="text-[11px] text-on-surface-variant mt-1">${present}/${total} sessions attended</p>
+      </div>
+    </div>`;
+  }).join('') || '<p class="text-on-surface-variant">No data yet.</p>';
+
+  const repLow = document.getElementById('report-low-students');
+  const lowStudents = allStudents.filter(s=>s.attendancePercentage<75).sort((a,b)=>a.attendancePercentage-b.attendancePercentage);
+  repLow.innerHTML = lowStudents.length ? lowStudents.map(s=>`
+  <div class="flex items-center justify-between p-3 bg-error-container/30 rounded-xl">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background:${PU.avatarColor(s.user?.name||'?')}">${PU.initials(s.user?.name||'?')}</div>
+      <div>
+        <p class="font-bold text-label-md">${s.user?.name||'—'}</p>
+        <p class="text-[11px] text-on-surface-variant">${s.studentUniqueId} · ${s.department}</p>
+      </div>
+    </div>
+    <span class="font-bold text-error text-label-md">${s.attendancePercentage}%</span>
+  </div>`).join('')
+  : '<p class="text-green-700 font-bold flex items-center gap-2"><span class="material-symbols-outlined" style="font-variation-settings:\'FILL\' 1">verified</span> All students above 75%!</p>';
+}
+
+// ── Subject CRUD ──────────────────────────────────────────────────────────
+function openSubjectModal(subject = null) {
+  document.getElementById('modal-title').textContent = subject ? 'Edit Subject' : 'Add Subject';
+  document.getElementById('subject-edit-id').value   = subject?.id || '';
+  document.getElementById('sub-name').value          = subject?.name || '';
+  document.getElementById('sub-code').value          = subject?.code || '';
+  document.getElementById('sub-semester').value      = subject?.semester || '';
+  document.getElementById('modal-error').classList.add('hidden');
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function closeSubjectModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.add('hidden');
+}
+function editSubject(id) {
+  const s = mySubjects.find(s=>s.id===id);
+  if (s) openSubjectModal(s);
+}
+async function deleteSubject(id) {
+  if (!confirm('Delete this subject? All its attendance records will also be removed.')) return;
+  try {
+    await PU.delete(`/subjects/${id}`);
+    mySubjects = mySubjects.filter(s=>s.id!==id);
+    delete allAttendance[id];
+    renderSubjectsGrid(); renderOverview(); renderReports();
+    PU.toast('Subject deleted.','success');
+  } catch(e) { PU.toast(e.message,'error'); }
+}
+async function saveSubject(e) {
+  e.preventDefault();
+  const id  = document.getElementById('subject-edit-id').value;
+  const body = {
+    name: document.getElementById('sub-name').value.trim(),
+    code: document.getElementById('sub-code').value.trim(),
+    semester: parseInt(document.getElementById('sub-semester').value)
+  };
+  const btn = document.getElementById('modal-save-btn');
+  btn.disabled=true; btn.textContent='Saving…';
+  try {
+    if (id) {
+      const updated = await PU.put(`/subjects/${id}`, body);
+      const idx = mySubjects.findIndex(s=>s.id===id);
+      if (idx>-1) mySubjects[idx]={...mySubjects[idx],...updated};
+    } else {
+      const created = await PU.post('/subjects', body);
+      mySubjects.push(created);
+      allAttendance[created.id]=[];
+    }
+    document.getElementById('modal-overlay').classList.add('hidden');
+    renderSubjectsGrid(); renderOverview(); renderReports();
+    renderAttendanceSection();
+    PU.toast(`Subject ${id?'updated':'created'} successfully!`,'success');
+  } catch(err) {
+    document.getElementById('modal-error').textContent = err.message;
+    document.getElementById('modal-error').classList.remove('hidden');
+  } finally { btn.disabled=false; btn.textContent='Save Subject'; }
+}
+
+// ── Student CRUD ──────────────────────────────────────────────────────────
+function openStudentModal(student = null) {
+  document.getElementById('student-modal-title').textContent = student ? 'Edit Student' : 'Add Student';
+  document.getElementById('student-edit-id').value   = student?.id || '';
+  document.getElementById('stud-name').value          = student?.user?.name || '';
+  document.getElementById('stud-email').value         = student?.user?.email || '';
+  document.getElementById('stud-phone').value         = student?.user?.phone || '';
+  document.getElementById('stud-unique-id').value    = student?.studentUniqueId || '';
+  document.getElementById('stud-dept').value         = student?.department || 'Computer Science';
+  document.getElementById('stud-semester').value     = student?.semester || '6';
+  
+  const pwdGroup = document.getElementById('stud-password-group');
+  if (student) {
+    pwdGroup.classList.add('hidden');
+    document.getElementById('stud-password').value = '';
+    document.getElementById('stud-password').required = false;
+  } else {
+    pwdGroup.classList.remove('hidden');
+    document.getElementById('stud-password').value = '';
+    document.getElementById('stud-password').required = false;
+  }
+
+  document.getElementById('student-modal-error').classList.add('hidden');
+  document.getElementById('student-modal-overlay').classList.remove('hidden');
+}
+
+function closeStudentModal(e) {
+  if (e && e.target !== document.getElementById('student-modal-overlay')) return;
+  document.getElementById('student-modal-overlay').classList.add('hidden');
+}
+
+function editStudent(id) {
+  const s = allStudents.find(st => st.id === id);
+  if (s) openStudentModal(s);
+}
+
+async function deleteStudent(id) {
+  if (!confirm('Delete this student? This will permanently remove their user account, attendance logs, and student profile.')) return;
+  try {
+    await PU.deleteStudent(id);
+    allStudents = allStudents.filter(st => st.id !== id);
+    renderStudentsTable();
+    renderOverview();
+    renderReports();
+    PU.toast('Student deleted successfully.', 'success');
+  } catch(e) {
+    PU.toast(e.message, 'error');
+  }
+}
+
+async function saveStudent(e) {
+  e.preventDefault();
+  const id = document.getElementById('student-edit-id').value;
+  const password = document.getElementById('stud-password').value.trim();
+  const body = {
+    name: document.getElementById('stud-name').value.trim(),
+    email: document.getElementById('stud-email').value.trim(),
+    phone: document.getElementById('stud-phone').value.trim(),
+    studentUniqueId: document.getElementById('stud-unique-id').value.trim(),
+    department: document.getElementById('stud-dept').value,
+    semester: parseInt(document.getElementById('stud-semester').value)
+  };
+  
+  if (!id && password) {
+    body.password = password;
+  }
+
+  const btn = document.getElementById('student-modal-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    if (id) {
+      const updated = await PU.updateStudent(id, body);
+      const idx = allStudents.findIndex(st => st.id === id);
+      if (idx > -1) {
+        const prevPercentage = allStudents[idx].attendancePercentage;
+        allStudents[idx] = { ...allStudents[idx], ...updated };
+        if (updated.attendancePercentage === undefined) {
+          allStudents[idx].attendancePercentage = prevPercentage;
+        }
+      }
+    } else {
+      const created = await PU.createStudent(body);
+      allStudents.push(created);
+    }
+    document.getElementById('student-modal-overlay').classList.add('hidden');
+    
+    const deptSel = document.getElementById('student-dept-filter');
+    deptSel.innerHTML = '<option value="">All Departments</option>';
+    [...new Set(allStudents.map(s => s.department))].sort().forEach(d => deptSel.add(new Option(d, d)));
+
+    renderStudentsTable();
+    renderOverview();
+    renderReports();
+    PU.toast(`Student ${id ? 'updated' : 'created'} successfully!`, 'success');
+  } catch(err) {
+    document.getElementById('student-modal-error').textContent = err.message;
+    document.getElementById('student-modal-error').classList.remove('hidden');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Student';
+  }
+}
+
+// ── Export CSV ─────────────────────────────────────────────────────────────
+function exportCSV() {
+  const rows = [['Student Name','Student ID','Department','Semester','Subject','Date','Status']];
+  for (const [subId, recs] of Object.entries(allAttendance)) {
+    for (const r of recs) {
+      rows.push([r.student?.user?.name||'',r.student?.studentUniqueId||'',r.student?.department||'',r.student?.semester||'',r.subject?.name||'',r.date?.slice(0,10)||'',r.status||'']);
+    }
+  }
+  const csv = rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = `PU_Attendance_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  PU.toast('CSV downloaded!','success');
+}
+</script>
+</body>
+</html>

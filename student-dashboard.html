@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Dashboard | Palamuru University</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config={darkMode:"class",theme:{extend:{"colors":{"primary":"#001e40","primary-container":"#003366","on-primary":"#ffffff","on-primary-container":"#799dd6","primary-fixed":"#d5e3ff","primary-fixed-dim":"#a7c8ff","secondary":"#705d00","secondary-container":"#fcd400","on-secondary":"#ffffff","on-secondary-container":"#6e5c00","secondary-fixed":"#ffe16d","secondary-fixed-dim":"#e9c400","on-secondary-fixed":"#221b00","on-secondary-fixed-variant":"#544600","error":"#ba1a1a","error-container":"#ffdad6","on-error":"#ffffff","on-error-container":"#93000a","surface":"#f9f9ff","surface-dim":"#cfdaf1","surface-container-low":"#f0f3ff","surface-container":"#e7eeff","surface-container-high":"#dee8ff","surface-container-highest":"#d8e3fa","surface-container-lowest":"#ffffff","surface-variant":"#d8e3fa","on-surface":"#111c2c","on-surface-variant":"#43474f","background":"#f9f9ff","outline":"#737780","outline-variant":"#c3c6d1","surface-tint":"#3a5f94","inverse-primary":"#a7c8ff","inverse-surface":"#263142","inverse-on-surface":"#ebf1ff","on-primary-fixed":"#001b3c","on-primary-fixed-variant":"#1f477b","tertiary":"#1c1f20","tertiary-container":"#313435","on-tertiary":"#ffffff","on-tertiary-container":"#9a9c9d","tertiary-fixed":"#e1e3e4","tertiary-fixed-dim":"#c5c7c8","on-tertiary-fixed":"#191c1d","on-tertiary-fixed-variant":"#454748"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin-desktop":"40px","container-max":"1280px","unit":"8px","margin-mobile":"16px","gutter":"24px"},"fontFamily":{"display-lg":["Playfair Display"],"label-sm":["Outfit"],"label-md":["Outfit"],"body-lg":["Outfit"],"headline-lg-mobile":["Playfair Display"],"headline-lg":["Playfair Display"],"body-md":["Outfit"],"headline-md":["Playfair Display"]},"fontSize":{"display-lg":["48px",{"lineHeight":"1.2","letterSpacing":"-0.02em","fontWeight":"700"}],"label-sm":["12px",{"lineHeight":"1.2","fontWeight":"500"}],"label-md":["14px",{"lineHeight":"1.2","letterSpacing":"0.05em","fontWeight":"600"}],"body-lg":["18px",{"lineHeight":"1.6","fontWeight":"400"}],"headline-lg-mobile":["28px",{"lineHeight":"1.3","fontWeight":"700"}],"headline-lg":["32px",{"lineHeight":"1.3","fontWeight":"700"}],"body-md":["16px",{"lineHeight":"1.6","fontWeight":"400"}],"headline-md":["24px",{"lineHeight":"1.4","fontWeight":"600"}]}}}}
+</script>
+<style>
+  .glass-card{background:rgba(255,255,255,.75);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.5);transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s ease}
+  .glass-card:hover:not(.no-hover){transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,51,102,.1)}
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+  .nav-link{transition:background-color .25s,color .25s,transform .2s}
+  .nav-link:hover{transform:translateX(3px)}
+  .nav-active{background:rgba(0,51,102,.12);color:#001e40;font-weight:600}
+  @keyframes countUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes subtlePulse{0%{box-shadow:0 0 0 0 rgba(186,26,26,.25)}70%{box-shadow:0 0 0 12px rgba(186,26,26,0)}100%{box-shadow:0 0 0 0 rgba(186,26,26,0)}}
+  @keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  .animate-pulse-warning{animation:subtlePulse 2.5s infinite}
+  .fade-in{animation:fadeIn .5s cubic-bezier(.16,1,.3,1) forwards}
+  .skeleton{background:linear-gradient(90deg,#e7eeff 25%,#f0f3ff 50%,#e7eeff 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+  .progress-ring{transition:stroke-dashoffset 1.4s cubic-bezier(.65,0,.35,1)}
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#c3c6d1;border-radius:10px}
+  /* Mobile bottom nav */
+  @media(max-width:768px){#main-content{margin-left:0!important;padding-bottom:5rem}}
+</style>
+</head>
+<body class="bg-background font-body-md text-on-surface">
+<script src="js/api.js"></script>
+
+<!-- Sidebar -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface-container-low/80 backdrop-blur-md shadow-md py-6 z-50 border-r border-outline-variant/30" id="sidebar">
+  <div class="px-6 mb-10 flex items-center gap-3">
+    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center p-0.5 shadow-md border border-outline-variant/20">
+      <img alt="Palamuru University" class="w-full h-full object-contain" src="images/02_palamuru_university_logo.png" onerror="this.style.display='none'"/>
+    </div>
+    <div>
+      <h1 class="font-display-lg text-headline-md text-primary leading-tight">Palamuru</h1>
+      <p class="font-outfit text-label-sm text-on-surface-variant">Student Portal</p>
+    </div>
+  </div>
+  <div class="flex-grow space-y-1 px-2">
+    <a class="nav-link nav-active rounded-lg px-4 py-3 flex items-center gap-3 cursor-pointer" onclick="showSection('overview')">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">dashboard</span>
+      <span class="font-outfit text-label-md">Overview</span>
+    </a>
+    <a class="nav-link text-on-surface-variant hover:bg-surface-variant/50 rounded-lg px-4 py-3 flex items-center gap-3 cursor-pointer" onclick="showSection('subjects')">
+      <span class="material-symbols-outlined">book</span>
+      <span class="font-outfit text-label-md">Subjects</span>
+    </a>
+    <a class="nav-link text-on-surface-variant hover:bg-surface-variant/50 rounded-lg px-4 py-3 flex items-center gap-3 cursor-pointer" onclick="showSection('history')">
+      <span class="material-symbols-outlined">history</span>
+      <span class="font-outfit text-label-md">Attendance Log</span>
+    </a>
+    <a class="nav-link text-on-surface-variant hover:bg-surface-variant/50 rounded-lg px-4 py-3 flex items-center gap-3 cursor-pointer" onclick="showSection('profile')">
+      <span class="material-symbols-outlined">account_circle</span>
+      <span class="font-outfit text-label-md">Profile</span>
+    </a>
+  </div>
+  <div class="px-4 mt-auto border-t border-outline-variant pt-4">
+    <div class="glass-card no-hover rounded-xl p-4 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" id="sidebar-avatar" style="background:#003366">S</div>
+      <div class="min-w-0">
+        <p class="text-label-md font-bold text-primary truncate" id="sidebar-name">Loading...</p>
+        <p class="text-label-sm text-on-surface-variant truncate" id="sidebar-email">—</p>
+      </div>
+    </div>
+    <button onclick="PU.logout()" class="mt-3 w-full flex items-center gap-2 px-4 py-2 text-on-surface-variant hover:text-error hover:bg-error-container/30 rounded-lg transition-colors text-label-sm font-outfit">
+      <span class="material-symbols-outlined text-[18px]">logout</span> Sign Out
+    </button>
+  </div>
+</nav>
+
+<!-- Main -->
+<main class="md:ml-64 min-h-screen pb-20" id="main-content">
+  <!-- Top Bar -->
+  <header class="h-20 flex items-center justify-between px-6 md:px-8 bg-surface/70 backdrop-blur-xl border-b border-white/40 sticky top-0 z-40">
+    <div>
+      <h2 class="font-display-lg text-headline-md text-primary" id="section-title">Attendance Overview</h2>
+      <p class="font-outfit text-label-sm text-on-surface-variant uppercase tracking-widest" id="section-subtitle">Loading your data...</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="relative">
+        <button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors relative" id="notif-btn">
+          <span class="material-symbols-outlined">notifications</span>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full" id="notif-dot"></span>
+        </button>
+      </div>
+      <div class="h-8 w-[1px] bg-outline-variant"></div>
+      <div class="flex flex-col items-end">
+        <span class="font-outfit text-label-md font-bold" id="today-date">—</span>
+        <span class="font-outfit text-[10px] text-on-surface-variant">Live Data</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════ SECTION: OVERVIEW ═══════════════════════ -->
+  <div id="sec-overview" class="p-6 md:p-8 max-w-[1400px] mx-auto">
+    <!-- Skeleton while loading -->
+    <div id="overview-skeleton" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="skeleton h-36 rounded-xl"></div>
+        <div class="skeleton h-36 rounded-xl"></div>
+        <div class="skeleton h-36 rounded-xl"></div>
+        <div class="skeleton h-36 rounded-xl"></div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-8 skeleton h-64 rounded-xl"></div>
+        <div class="lg:col-span-4 skeleton h-64 rounded-xl"></div>
+      </div>
+    </div>
+
+    <!-- Real content (hidden until data loads) -->
+    <div id="overview-content" class="hidden space-y-6">
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Overall % -->
+        <div class="glass-card rounded-xl p-6 relative overflow-hidden group fade-in">
+          <div class="absolute -right-4 -top-4 w-24 h-24 bg-primary-container/10 rounded-full blur-2xl"></div>
+          <p class="font-outfit text-label-sm text-on-surface-variant mb-2">Overall Attendance</p>
+          <div class="flex items-end gap-2">
+            <span class="font-display-lg text-[40px] text-primary" id="kpi-pct">—</span>
+            <span class="mb-1 text-xs font-bold flex items-center gap-0.5" id="kpi-trend"></span>
+          </div>
+          <div class="mt-4 h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-1000" id="kpi-bar" style="width:0%"></div>
+          </div>
+        </div>
+        <!-- Classes -->
+        <div class="glass-card rounded-xl p-6 fade-in" style="animation-delay:.1s">
+          <p class="font-outfit text-label-sm text-on-surface-variant mb-2">Academic Performance</p>
+          <div class="space-y-2">
+            <div class="flex justify-between"><span class="text-label-md">Total Classes</span><span class="font-bold text-primary" id="kpi-total">—</span></div>
+            <div class="flex justify-between"><span class="text-label-md">Attended</span><span class="font-bold text-primary" id="kpi-attended">—</span></div>
+            <div class="flex justify-between"><span class="text-label-md">Absent</span><span class="font-bold text-error" id="kpi-absent">—</span></div>
+          </div>
+          <div class="mt-4 flex items-center gap-1.5 text-primary/60 text-[11px]">
+            <span class="material-symbols-outlined text-sm">info</span> Mandatory: 75% for Finals
+          </div>
+        </div>
+        <!-- Status -->
+        <div class="glass-card rounded-xl p-6 fade-in" style="animation-delay:.2s" id="kpi-status-card">
+          <p class="font-outfit text-label-sm text-on-surface-variant mb-2">Threshold Status</p>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="material-symbols-outlined text-2xl" id="kpi-status-icon">verified</span>
+            <span class="font-bold text-headline-md" id="kpi-status-text">—</span>
+          </div>
+          <p class="text-xs text-on-surface-variant" id="kpi-status-desc">—</p>
+        </div>
+        <!-- Warnings -->
+        <div class="glass-card rounded-xl p-6 flex flex-col justify-center fade-in animate-pulse-warning" style="animation-delay:.3s" id="kpi-warn-card">
+          <div class="flex items-center gap-2 text-on-error-container mb-2">
+            <span class="material-symbols-outlined text-error">warning</span>
+            <span class="font-bold uppercase text-[10px] tracking-widest">Action Required</span>
+          </div>
+          <h3 class="font-display-lg text-headline-md text-error leading-none" id="kpi-warn-count">—</h3>
+          <p class="text-xs mt-1 text-on-surface-variant" id="kpi-warn-desc">—</p>
+        </div>
+      </div>
+
+      <!-- Subject Cards + Activity -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Subject Cards -->
+        <div class="lg:col-span-8 space-y-6">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display-lg text-headline-md text-primary">Subject Distribution</h3>
+            <button onclick="showSection('subjects')" class="text-primary font-outfit text-label-md hover:underline">View All</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="subject-cards"></div>
+          <!-- Heatmap (last 14 days) -->
+          <div class="glass-card no-hover p-6 rounded-xl">
+            <div class="flex items-center justify-between mb-6">
+              <h4 class="font-outfit text-label-md font-bold text-primary">Recent Attendance Map (14 days)</h4>
+              <div class="flex gap-3 text-[10px] text-on-surface-variant font-bold uppercase">
+                <div class="flex items-center gap-1"><div class="w-3 h-3 bg-primary-container rounded-sm"></div>Present</div>
+                <div class="flex items-center gap-1"><div class="w-3 h-3 bg-error rounded-sm"></div>Absent</div>
+                <div class="flex items-center gap-1"><div class="w-3 h-3 bg-secondary-container rounded-sm"></div>Late</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-7 gap-2" id="heatmap"></div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="lg:col-span-4">
+          <div class="glass-card no-hover p-6 rounded-xl h-full">
+            <h4 class="font-display-lg text-headline-md text-primary mb-6">Recent Activity</h4>
+            <div class="space-y-5 relative before:absolute before:left-[10px] before:top-2 before:bottom-2 before:w-[1px] before:bg-outline-variant" id="activity-feed"></div>
+            <button onclick="showSection('history')" class="w-full mt-8 py-3 rounded-lg border-2 border-primary text-primary font-bold text-label-md hover:bg-primary hover:text-white transition-all group">
+              Full Log <span class="material-symbols-outlined align-middle ml-1 text-sm">history</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ SECTION: SUBJECTS ═══════════════════════ -->
+  <div id="sec-subjects" class="hidden p-6 md:p-8 max-w-[1400px] mx-auto">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+      <h3 class="font-display-lg text-headline-lg text-primary">My Subjects</h3>
+      <!-- Semester filter pills -->
+      <div class="flex flex-wrap gap-2 items-center" id="sub-sem-pills">
+        <span class="font-outfit text-label-sm text-on-surface-variant mr-1">Semester:</span>
+        <!-- Pills populated by JS -->
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="all-subject-cards"></div>
+  </div>
+
+  <!-- ═══════════════════════ SECTION: HISTORY ════════════════════════ -->
+  <div id="sec-history" class="hidden p-6 md:p-8 max-w-[1400px] mx-auto">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <h3 class="font-display-lg text-headline-lg text-primary">Attendance Log</h3>
+      <!-- Semester filter pills for history -->
+      <div class="flex flex-wrap gap-2 items-center" id="hist-sem-pills">
+        <span class="font-outfit text-label-sm text-on-surface-variant mr-1">Semester:</span>
+        <!-- Pills populated by JS -->
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-2 mb-6">
+      <select id="filter-subject" class="bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-label-md font-outfit focus:outline-none focus:border-primary" onchange="renderHistory()">
+        <option value="">All Subjects</option>
+      </select>
+      <select id="filter-status" class="bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-label-md font-outfit focus:outline-none focus:border-primary" onchange="renderHistory()">
+        <option value="">All Statuses</option>
+        <option value="PRESENT">Present</option>
+        <option value="ABSENT">Absent</option>
+        <option value="LATE">Late</option>
+      </select>
+    </div>
+    <div class="glass-card no-hover rounded-xl overflow-hidden">
+      <table class="w-full text-left">
+        <thead class="bg-surface-container-high">
+          <tr class="text-label-md text-on-surface-variant uppercase tracking-wider">
+            <th class="px-6 py-4 font-bold">Date</th>
+            <th class="px-6 py-4 font-bold">Subject</th>
+            <th class="px-6 py-4 font-bold text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody id="history-tbody" class="divide-y divide-surface-variant/30"></tbody>
+      </table>
+      <div id="history-empty" class="hidden py-16 text-center text-on-surface-variant">
+        <span class="material-symbols-outlined text-5xl mb-2">event_busy</span>
+        <p class="font-outfit">No attendance records found.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ SECTION: PROFILE ════════════════════════ -->
+  <div id="sec-profile" class="hidden p-6 md:p-8 max-w-2xl mx-auto">
+    <h3 class="font-display-lg text-headline-lg text-primary mb-8">My Profile</h3>
+    <div class="glass-card no-hover rounded-2xl p-8 space-y-6">
+      <div class="flex items-center gap-6">
+        <div class="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold" id="profile-avatar" style="background:#003366">S</div>
+        <div>
+          <h2 class="font-display-lg text-headline-md text-primary" id="profile-name">—</h2>
+          <p class="text-on-surface-variant" id="profile-role">Student</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-outline-variant/30">
+        <div class="bg-surface-container-low rounded-xl p-4">
+          <p class="text-label-sm text-on-surface-variant mb-1">Email</p>
+          <p class="font-bold text-on-surface" id="profile-email">—</p>
+        </div>
+        <div class="bg-surface-container-low rounded-xl p-4">
+          <p class="text-label-sm text-on-surface-variant mb-1">Student ID</p>
+          <p class="font-bold text-on-surface font-mono" id="profile-id">—</p>
+        </div>
+        <div class="bg-surface-container-low rounded-xl p-4">
+          <p class="text-label-sm text-on-surface-variant mb-1">Department</p>
+          <p class="font-bold text-on-surface" id="profile-dept">—</p>
+        </div>
+        <div class="bg-surface-container-low rounded-xl p-4">
+          <p class="text-label-sm text-on-surface-variant mb-1">Semester</p>
+          <p class="font-bold text-on-surface" id="profile-sem">—</p>
+        </div>
+        <div class="bg-surface-container-low rounded-xl p-4">
+          <p class="text-label-sm text-on-surface-variant mb-1">Overall Attendance</p>
+          <p class="font-bold text-primary text-xl" id="profile-pct">—</p>
+        </div>
+        <div class="bg-surface-container-low rounded-xl p-4">
+          <p class="text-label-sm text-on-surface-variant mb-1">Phone</p>
+          <p class="font-bold text-on-surface" id="profile-phone">—</p>
+        </div>
+      </div>
+      <button onclick="PU.logout()" class="w-full py-3 rounded-xl bg-error-container text-on-error-container font-bold flex items-center justify-center gap-2 hover:bg-error hover:text-white transition-all">
+        <span class="material-symbols-outlined">logout</span> Sign Out
+      </button>
+    </div>
+  </div>
+</main>
+
+<!-- Mobile Bottom Nav -->
+<div class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container-low/95 backdrop-blur-md border-t border-outline-variant flex justify-around py-3 z-50">
+  <button onclick="showSection('overview')"  class="flex flex-col items-center gap-0.5 text-primary"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">dashboard</span><span class="text-[9px] font-bold">Overview</span></button>
+  <button onclick="showSection('subjects')"  class="flex flex-col items-center gap-0.5 text-on-surface-variant"><span class="material-symbols-outlined">book</span><span class="text-[9px] font-bold">Subjects</span></button>
+  <button onclick="showSection('history')"   class="flex flex-col items-center gap-0.5 text-on-surface-variant"><span class="material-symbols-outlined">history</span><span class="text-[9px] font-bold">Log</span></button>
+  <button onclick="showSection('profile')"   class="flex flex-col items-center gap-0.5 text-on-surface-variant"><span class="material-symbols-outlined">account_circle</span><span class="text-[9px] font-bold">Profile</span></button>
+</div>
+
+<script>
+// ── Auth guard ────────────────────────────────────────────────────────────────
+if (!PU.requireAuth(['STUDENT'])) { /* redirected */ }
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let studentData = null;   // full student record from API
+let attendanceRecords = [];
+let mySubjects = [];      // all subjects for student's semester
+let semesterFilter = '';  // active semester filter ('', '1', '2', …)
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+(async function boot() {
+  const user = PU.getUser();
+
+  // Fill sidebar & header
+  document.getElementById('sidebar-name').textContent  = user.name;
+  document.getElementById('sidebar-email').textContent = user.email;
+  const av = document.getElementById('sidebar-avatar');
+  av.textContent = PU.initials(user.name);
+  av.style.background = PU.avatarColor(user.name);
+
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+
+  try {
+    // Fetch student list and find this user's student record
+    const students = await PU.getStudents();
+    studentData = students.find(s => s.user.email === user.email);
+
+    if (!studentData) {
+      PU.toast('Could not load student profile. Please contact admin.', 'error');
+      showOverviewSkeleton(false);
+      return;
+    }
+
+    // Fetch attendance records and subjects
+    [attendanceRecords, mySubjects] = await Promise.all([
+      PU.getAttendanceByStudent(studentData.id),
+      PU.getSubjects()
+    ]);
+
+    // Default semester filter to the student's own semester
+    semesterFilter = String(studentData.semester);
+
+    // Build semester pill bars
+    buildSemesterPills();
+
+    // Render everything
+    renderOverview();
+    renderSubjects();
+    renderHistory();
+    renderProfile(user);
+
+    document.getElementById('section-subtitle').textContent =
+      `Semester ${studentData.semester} | ${studentData.department}`;
+  } catch(e) {
+    PU.toast(e.message || 'Failed to load data', 'error');
+    showOverviewSkeleton(false);
+  }
+})();
+
+// ── Section switcher ──────────────────────────────────────────────────────────
+function showSection(name) {
+  ['overview','subjects','history','profile'].forEach(s => {
+    document.getElementById(`sec-${s}`).classList.add('hidden');
+  });
+  document.getElementById(`sec-${name}`).classList.remove('hidden');
+
+  const titles = {overview:'Attendance Overview',subjects:'My Subjects',history:'Attendance Log',profile:'My Profile'};
+  document.getElementById('section-title').textContent = titles[name];
+
+  // update nav active state
+  document.querySelectorAll('#sidebar .nav-link').forEach((el,i) => {
+    el.classList.remove('nav-active','text-primary');
+    el.classList.add('text-on-surface-variant');
+  });
+  const idx = {overview:0,subjects:1,history:2,profile:3}[name];
+  const links = document.querySelectorAll('#sidebar .nav-link');
+  if (links[idx]) { links[idx].classList.add('nav-active'); links[idx].classList.remove('text-on-surface-variant'); }
+}
+
+function showOverviewSkeleton(show) {
+  document.getElementById('overview-skeleton').classList.toggle('hidden', !show);
+  document.getElementById('overview-content').classList.toggle('hidden',  show);
+}
+
+// ── Render: Overview ──────────────────────────────────────────────────────────
+function renderOverview() {
+  const pct = studentData.attendancePercentage;
+  const total = attendanceRecords.length;
+  const attended = attendanceRecords.filter(r => r.status === 'PRESENT' || r.status === 'LATE').length;
+  const absent   = attendanceRecords.filter(r => r.status === 'ABSENT').length;
+
+  // KPI cards
+  document.getElementById('kpi-pct').textContent    = `${pct}%`;
+  document.getElementById('kpi-total').textContent  = total;
+  document.getElementById('kpi-attended').textContent = attended;
+  document.getElementById('kpi-absent').textContent   = absent;
+
+  // Progress bar
+  const bar = document.getElementById('kpi-bar');
+  const col = PU.progressColor(pct);
+  bar.style.background = col;
+  setTimeout(() => bar.style.width = `${Math.min(pct,100)}%`, 200);
+
+  // Status card
+  const statusIcon = document.getElementById('kpi-status-icon');
+  const statusText = document.getElementById('kpi-status-text');
+  const statusDesc = document.getElementById('kpi-status-desc');
+  const statusCard = document.getElementById('kpi-status-card');
+  if (total === 0) {
+    statusIcon.textContent = 'info'; statusIcon.style.color = '#003366';
+    statusText.textContent = 'No Classes'; statusText.style.color = '#003366';
+    statusDesc.textContent = 'No attendance sessions have been recorded for you yet. Welcome to the portal!';
+    statusCard.classList.remove('border','border-error/30','bg-error-container/10');
+  } else if (pct >= 75) {
+    statusIcon.textContent = 'verified'; statusIcon.style.color = '#705d00';
+    statusText.textContent = 'Safe'; statusText.style.color = '#705d00';
+    statusDesc.textContent = `You are ${(pct - 75).toFixed(1)}% above the 75% minimum requirement. Keep it up!`;
+    statusCard.classList.remove('border','border-error/30','bg-error-container/10');
+  } else {
+    statusIcon.textContent = 'warning'; statusIcon.style.color = '#ba1a1a';
+    statusText.textContent = 'At Risk'; statusText.style.color = '#ba1a1a';
+    const needed = Math.ceil((0.75 * (total + 10) - attended));
+    statusDesc.textContent = `You need ${needed} more attendances to reach 75%. Act now!`;
+    statusCard.classList.add('border','border-error/30','bg-error-container/10');
+  }
+
+  // Warnings
+  const warnSubjects = getSubjectStats().filter(s => s.pct < 75);
+  const warnCard = document.getElementById('kpi-warn-card');
+  const warnCount = document.getElementById('kpi-warn-count');
+  const warnDesc = document.getElementById('kpi-warn-desc');
+
+  if (total === 0) {
+    warnCard.classList.remove('animate-pulse-warning', 'border-error/30', 'bg-error-container/10');
+    warnCount.textContent = '0';
+    warnDesc.textContent = 'No pending warnings. You\'re on track!';
+    document.getElementById('notif-dot').classList.add('hidden');
+  } else {
+    warnCount.textContent = warnSubjects.length;
+    warnDesc.textContent = warnSubjects.length
+      ? `${warnSubjects.map(s=>s.name).join(', ')} below threshold.`
+      : 'No pending warnings. You\'re on track!';
+    if (warnSubjects.length) {
+      warnCard.classList.add('animate-pulse-warning');
+      document.getElementById('notif-dot').classList.remove('hidden');
+    } else {
+      warnCard.classList.remove('animate-pulse-warning');
+      document.getElementById('notif-dot').classList.add('hidden');
+    }
+  }
+
+  renderSubjectCards();
+  renderHeatmap();
+  renderActivityFeed();
+
+  showOverviewSkeleton(false);
+}
+
+// ── Subject stats ─────────────────────────────────────────────────────────────
+function getSubjectStats() {
+  const map = {};
+  for (const s of mySubjects) {
+    map[s.id] = { id: s.id, name: s.name, code: s.code, total: 0, attended: 0 };
+  }
+  for (const r of attendanceRecords) {
+    const sid = r.subject.id;
+    if (map[sid]) {
+      map[sid].total++;
+      if (r.status === 'PRESENT' || r.status === 'LATE') map[sid].attended++;
+    }
+  }
+  return Object.values(map).map(s => ({
+    ...s,
+    pct: s.total ? Math.round(s.attended/s.total*100) : 100
+  }));
+}
+
+// ── Render: Subject cards (overview grid) ─────────────────────────────────────
+function renderSubjectCards() {
+  const stats = getSubjectStats().slice(0,4);
+  const container = document.getElementById('subject-cards');
+  container.innerHTML = stats.length ? stats.map(s => subjectCardHTML(s, true)).join('') : `<p class="text-on-surface-variant col-span-2">No subjects found.</p>`;
+}
+
+function subjectCardHTML(s, small = false) {
+  const badge = PU.attendanceBadge(s.pct);
+  const circ  = 175.9;
+  const offset = circ - (s.pct / 100) * circ;
+  const strokeColor = PU.progressColor(s.pct);
+  return `
+  <div class="glass-card p-5 rounded-xl flex items-center gap-5 fade-in">
+    <div class="relative w-16 h-16 flex-shrink-0">
+      <svg class="w-full h-full -rotate-90" viewBox="0 0 64 64">
+        <circle cx="32" cy="32" r="28" fill="transparent" stroke="#e7eeff" stroke-width="5"/>
+        <circle cx="32" cy="32" r="28" fill="transparent" stroke="${strokeColor}" stroke-width="5"
+          stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round"
+          class="progress-ring"/>
+      </svg>
+      <span class="absolute inset-0 flex items-center justify-center font-bold text-xs text-on-surface">${s.pct}%</span>
+    </div>
+    <div class="flex-grow min-w-0">
+      <div class="flex justify-between items-start mb-1">
+        <h4 class="font-outfit text-label-md font-bold text-primary truncate">${s.name}</h4>
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ml-2 flex-shrink-0 ${badge.cls}">${badge.label}</span>
+      </div>
+      <p class="text-xs text-on-surface-variant">${s.code} &bull; ${s.attended}/${s.total} sessions</p>
+    </div>
+  </div>`;
+}
+
+// ── Semester pill bars ────────────────────────────────────────────────────────
+function buildSemesterPills() {
+  // Always show all 8 B.Tech semesters; grey-out ones with no subjects
+  const semsWithSubjects = new Set(mySubjects.map(s => String(s.semester)));
+  const allSems = ['', '1','2','3','4','5','6','7','8'];
+  ['sub-sem-pills','hist-sem-pills'].forEach(containerId => {
+    const container = document.getElementById(containerId);
+    container.querySelectorAll('button').forEach(b => b.remove());
+    allSems.forEach(sem => {
+      const btn = document.createElement('button');
+      btn.textContent = sem === '' ? 'All' : `Sem ${sem}`;
+      btn.dataset.sem = sem;
+      const isActive = semesterFilter === sem;
+      const hasData = sem === '' || semsWithSubjects.has(sem);
+      btn.disabled = !hasData;
+      btn.className = `px-3 py-1 rounded-full text-label-sm font-bold transition-all border ${
+        isActive
+          ? 'bg-primary text-white border-primary shadow-md'
+          : hasData
+            ? 'bg-surface-container text-on-surface-variant border-outline-variant hover:border-primary hover:text-primary'
+            : 'bg-surface-container/40 text-on-surface-variant/30 border-outline-variant/30 cursor-not-allowed'
+      }`;
+      btn.onclick = () => {
+        if (!hasData) return;
+        semesterFilter = sem;
+        buildSemesterPills();
+        renderSubjects();
+        renderHistory();
+      };
+      container.appendChild(btn);
+    });
+  });
+}
+
+// ── Render: All subjects section ──────────────────────────────────────────────
+function renderSubjects() {
+  let stats = getSubjectStats();
+  if (semesterFilter) {
+    stats = stats.filter(s => {
+      const sub = mySubjects.find(m => m.id === s.id);
+      return sub && String(sub.semester) === semesterFilter;
+    });
+  }
+  const container = document.getElementById('all-subject-cards');
+  container.innerHTML = stats.length ? stats.map(s => {
+    const sub = mySubjects.find(m => m.id === s.id);
+    const sem = sub ? sub.semester : '?';
+    return `
+  <div class="glass-card rounded-2xl p-6 fade-in">
+    <div class="flex items-center gap-4 mb-4">
+      <div class="relative w-20 h-20 flex-shrink-0">
+        <svg class="w-full h-full -rotate-90" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="28" fill="transparent" stroke="#e7eeff" stroke-width="5"/>
+          <circle cx="32" cy="32" r="28" fill="transparent" stroke="${PU.progressColor(s.pct)}" stroke-width="5"
+            stroke-dasharray="175.9" stroke-dashoffset="${175.9 - s.pct/100*175.9}" stroke-linecap="round"/>
+        </svg>
+        <span class="absolute inset-0 flex items-center justify-center font-bold text-sm">${s.pct}%</span>
+      </div>
+      <div>
+        <h3 class="font-display-lg text-headline-md text-primary">${s.name}</h3>
+        <p class="text-on-surface-variant text-label-sm">${s.code}</p>
+        <div class="flex gap-2 mt-1">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-container/40 text-primary">Sem ${sem}</span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${PU.attendanceBadge(s.pct).cls}">${PU.attendanceBadge(s.pct).label}</span>
+        </div>
+      </div>
+    </div>
+    <div class="space-y-2 text-label-md">
+      <div class="flex justify-between"><span>Classes Attended</span><span class="font-bold text-primary">${s.attended}</span></div>
+      <div class="flex justify-between"><span>Total Classes</span><span class="font-bold">${s.total}</span></div>
+      <div class="flex justify-between"><span>Missed</span><span class="font-bold text-error">${s.total - s.attended}</span></div>
+    </div>
+    <div class="mt-4 h-2 w-full bg-surface-container rounded-full overflow-hidden">
+      <div class="h-full rounded-full" style="width:${s.pct}%;background:${PU.progressColor(s.pct)};transition:width 1s ease"></div>
+    </div>
+  </div>`;
+  }).join('') : `<div class="col-span-full text-center py-14 text-on-surface-variant">
+    <span class="material-symbols-outlined text-5xl mb-2">filter_list_off</span>
+    <p class="font-outfit mt-1">No subjects found for ${semesterFilter ? 'Semester '+semesterFilter : 'current filter'}.</p>
+  </div>`;
+}
+
+// ── Render: Heatmap (last 14 days) ────────────────────────────────────────────
+function renderHeatmap() {
+  const container = document.getElementById('heatmap');
+  const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  container.innerHTML = days.map(d => `<div class="text-center font-outfit text-[9px] font-bold text-on-surface-variant">${d}</div>`).join('');
+
+  const today = new Date();
+  const byDate = {};
+  attendanceRecords.forEach(r => { const d = r.date.slice(0,10); if (!byDate[d]) byDate[d]=[]; byDate[d].push(r.status); });
+
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0,10);
+    const recs = byDate[key] || [];
+    const isPresent = recs.some(s => s==='PRESENT'), isLate = recs.some(s => s==='LATE'), isAbsent = recs.some(s => s==='ABSENT');
+    const bg = isPresent ? 'bg-primary-container' : isLate ? 'bg-secondary-container' : isAbsent ? 'bg-error' : 'bg-surface-variant';
+    const label = d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    container.innerHTML += `<div class="aspect-square rounded ${bg} cursor-pointer hover:scale-110 transition-transform" title="${label}: ${recs[0]||'No class'}"></div>`;
+  }
+}
+
+// ── Render: Activity feed ─────────────────────────────────────────────────────
+function renderActivityFeed() {
+  const feed = document.getElementById('activity-feed');
+  const recent = [...attendanceRecords].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,6);
+  feed.innerHTML = recent.map(r => {
+    const col  = r.status==='PRESENT' ? '#16a34a' : r.status==='LATE' ? '#d97706' : '#ba1a1a';
+    const txt  = r.status==='PRESENT' ? 'text-green-600' : r.status==='LATE' ? 'text-yellow-600' : 'text-error';
+    return `
+    <div class="flex gap-4 relative">
+      <div class="w-[22px] h-[22px] rounded-full flex-shrink-0 flex items-center justify-center z-10 border-4 border-surface" style="background:${col}"></div>
+      <div>
+        <p class="font-outfit text-label-md font-bold text-primary">${r.subject.name}</p>
+        <p class="text-[11px] font-bold uppercase tracking-wide ${txt}">${r.status}</p>
+        <p class="text-xs text-on-surface-variant mt-0.5">${PU.formatDate(r.date)}</p>
+      </div>
+    </div>`;
+  }).join('') || '<p class="text-on-surface-variant text-sm ml-8">No recent activity.</p>';
+}
+
+// ── Render: History table ─────────────────────────────────────────────────────
+function renderHistory() {
+  const subjectFilter = document.getElementById('filter-subject').value;
+  const statusFilter  = document.getElementById('filter-status').value;
+
+  // Build a set of subject IDs that match the semester filter
+  const semSubjectIds = semesterFilter
+    ? new Set(mySubjects.filter(s => String(s.semester) === semesterFilter).map(s => s.id))
+    : null;
+
+  // Populate subject filter dropdown (scoped to current semester filter)
+  const sel = document.getElementById('filter-subject');
+  const relevantSubjectNames = [...new Set(
+    attendanceRecords
+      .filter(r => !semSubjectIds || semSubjectIds.has(r.subject.id))
+      .map(r => r.subject.name)
+  )];
+  // Reset & repopulate
+  sel.innerHTML = '<option value="">All Subjects</option>';
+  relevantSubjectNames.forEach(s => sel.add(new Option(s, s)));
+
+  let filtered = [...attendanceRecords].sort((a,b) => new Date(b.date)-new Date(a.date));
+  if (semSubjectIds) filtered = filtered.filter(r => semSubjectIds.has(r.subject.id));
+  if (subjectFilter) filtered = filtered.filter(r => r.subject.name === subjectFilter);
+  if (statusFilter)  filtered = filtered.filter(r => r.status === statusFilter);
+
+  const tbody = document.getElementById('history-tbody');
+  const empty = document.getElementById('history-empty');
+  if (!filtered.length) { tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+
+  const badges = { PRESENT:'bg-secondary-container text-on-secondary-container', ABSENT:'bg-error-container text-on-error-container', LATE:'bg-yellow-100 text-yellow-800' };
+  tbody.innerHTML = filtered.map(r => {
+    const sub = mySubjects.find(m => m.id === r.subject.id);
+    const sem = sub ? sub.semester : '?';
+    return `
+    <tr class="hover:bg-primary-container/5 transition-colors">
+      <td class="px-6 py-4 text-label-md">${PU.formatDate(r.date)}</td>
+      <td class="px-6 py-4">
+        <div class="font-medium">${r.subject.name}</div>
+        <div class="text-xs text-on-surface-variant">${r.subject.code} &bull; Sem ${sem}</div>
+      </td>
+      <td class="px-6 py-4 text-center">
+        <span class="px-3 py-1 rounded-full text-[11px] font-bold ${badges[r.status]||'bg-surface-container text-on-surface-variant'}">${r.status}</span>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Render: Profile ───────────────────────────────────────────────────────────
+function renderProfile(user) {
+  document.getElementById('profile-name').textContent  = user.name;
+  document.getElementById('profile-email').textContent = user.email;
+  document.getElementById('profile-role').textContent  = 'Student';
+  const av = document.getElementById('profile-avatar');
+  av.textContent = PU.initials(user.name);
+  av.style.background = PU.avatarColor(user.name);
+  if (studentData) {
+    document.getElementById('profile-id').textContent   = studentData.studentUniqueId;
+    document.getElementById('profile-dept').textContent = studentData.department;
+    document.getElementById('profile-sem').textContent  = `Semester ${studentData.semester}`;
+    document.getElementById('profile-pct').textContent  = `${studentData.attendancePercentage}%`;
+    document.getElementById('profile-phone').textContent = studentData.user.phone || '—';
+  }
+}
+</script>
+</body>
+</html>

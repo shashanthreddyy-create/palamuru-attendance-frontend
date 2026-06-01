@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Palamuru University Attendance Portal</title>
+  <meta name="description" content="Secure login portal for Palamuru University's smart attendance management system. Access student and faculty dashboards." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            playfair: ['"Playfair Display"', 'serif'],
+            outfit:   ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            primary:               '#003366',
+            'on-primary':          '#ffffff',
+            'primary-container':   '#d4e3ff',
+            'on-primary-container':'#001e40',
+            secondary:             '#705d00',
+            'on-secondary':        '#ffffff',
+            'secondary-container': '#ffe170',
+            'on-secondary-container':'#221b00',
+            surface:               '#f8f9ff',
+            'on-surface':          '#1a1c20',
+            'surface-variant':     '#e0e2ec',
+            'on-surface-variant':  '#44464f',
+            'surface-container':   '#ecedf4',
+            'surface-container-low':'#f2f3fa',
+            'surface-container-high':'#e6e8ef',
+            outline:               '#74777f',
+            'outline-variant':     '#c4c6d0',
+            error:                 '#ba1a1a',
+            'error-container':     '#ffdad6',
+            'on-error-container':  '#410002',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; }
+
+    /* ── Animated gradient background ─────────────────────── */
+    .login-bg {
+      background: linear-gradient(135deg, #001e40 0%, #003366 30%, #1f477b 60%, #3a5f94 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+    }
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ── Floating particles ───────────────────────────────── */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      animation: floatParticle 18s infinite ease-in-out;
+    }
+    .particle:nth-child(1) { width:320px; height:320px; top:-60px;  left:-80px;  animation-delay:0s; }
+    .particle:nth-child(2) { width:200px; height:200px; bottom:15%; right:10%;   animation-delay:4s; }
+    .particle:nth-child(3) { width:140px; height:140px; top:45%;    left:20%;    animation-delay:8s; }
+    .particle:nth-child(4) { width:100px; height:100px; bottom:30%; left:60%;    animation-delay:2s; }
+    @keyframes floatParticle {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25%      { transform: translate(30px, -40px) scale(1.1); }
+      50%      { transform: translate(-20px, 20px) scale(.95); }
+      75%      { transform: translate(15px, 30px) scale(1.05); }
+    }
+
+    /* ── Glass card ────────────────────────────────────────── */
+    .glass-card {
+      background: rgba(255,255,255,.75);
+      backdrop-filter: blur(20px) saturate(1.6);
+      -webkit-backdrop-filter: blur(20px) saturate(1.6);
+      border: 1px solid rgba(255,255,255,.6);
+    }
+
+    /* ── Role tab pill ─────────────────────────────────────── */
+    .role-tabs {
+      background: #ecedf4;
+      border-radius: 14px;
+      padding: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .role-tab {
+      position: relative;
+      z-index: 2;
+      padding: 10px 0;
+      width: 50%;
+      font-weight: 600;
+      font-size: .9rem;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: #44464f;
+      transition: color .3s ease;
+    }
+    .role-tab.active { color: #ffffff; }
+    .role-slider {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      height: calc(100% - 8px);
+      background: linear-gradient(135deg, #003366, #1f477b);
+      border-radius: 11px;
+      transition: transform .35s cubic-bezier(.4, 0, .2, 1);
+      z-index: 1;
+      box-shadow: 0 2px 8px rgba(0,51,102,.3);
+    }
+    .role-slider.right { transform: translateX(100%); }
+
+    /* ── Inputs ─────────────────────────────────────────────── */
+    .input-group {
+      position: relative;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 14px 14px 14px 46px;
+      border: 2px solid #c4c6d0;
+      border-radius: 12px;
+      font-size: .95rem;
+      font-family: 'Outfit', sans-serif;
+      color: #1a1c20;
+      background: rgba(255,255,255,.6);
+      transition: border-color .25s, box-shadow .25s, background .25s;
+      outline: none;
+    }
+    .input-group input:focus {
+      border-color: #003366;
+      box-shadow: 0 0 0 3px rgba(0,51,102,.12);
+      background: #fff;
+    }
+    .input-group .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #74777f;
+      font-size: 20px;
+      transition: color .25s;
+    }
+    .input-group input:focus ~ .input-icon,
+    .input-group input:focus + .input-icon { color: #003366; }
+    .toggle-pw {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #74777f;
+      font-size: 20px;
+      border: none;
+      background: none;
+      transition: color .2s;
+    }
+    .toggle-pw:hover { color: #003366; }
+
+    /* ── Submit button ─────────────────────────────────────── */
+    .btn-login {
+      width: 100%;
+      padding: 15px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, #003366, #1f477b);
+      box-shadow: 0 4px 16px rgba(0,51,102,.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform .2s, box-shadow .2s, opacity .2s;
+    }
+    .btn-login:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,51,102,.35);
+    }
+    .btn-login:active:not(:disabled) { transform: translateY(0); }
+    .btn-login:disabled { opacity: .7; cursor: not-allowed; }
+
+    /* ── Spinner ────────────────────────────────────────────── */
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2.5px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error alert ───────────────────────────────────────── */
+    .error-alert {
+      background: #ffdad6;
+      border: 1px solid #ba1a1a33;
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      color: #410002;
+      font-size: .88rem;
+      font-weight: 500;
+      animation: shakeIn .4s ease;
+    }
+    .error-alert.visible { display: flex; }
+    @keyframes shakeIn {
+      0%, 100% { transform: translateX(0); }
+      20%      { transform: translateX(-6px); }
+      40%      { transform: translateX(6px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+
+    /* ── Toast ──────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 200;
+      padding: 16px 24px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 380px;
+      font-size: .9rem;
+      font-weight: 600;
+      color: #1a1c20;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,.6);
+      box-shadow: 0 8px 32px rgba(0,0,0,.12);
+      transform: translateY(120px);
+      opacity: 0;
+      transition: all .45s cubic-bezier(.16,1,.3,1);
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ── Badge ──────────────────────────────────────────────── */
+    .security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+    }
+
+    /* ── Scrollbar ──────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c4c6d0; border-radius: 9px; }
+
+    /* ── Animations ─────────────────────────────────────────── */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fsu { animation: fadeSlideUp .6s ease both; }
+    .delay-1 { animation-delay: .1s; }
+    .delay-2 { animation-delay: .2s; }
+    .delay-3 { animation-delay: .3s; }
+    .delay-4 { animation-delay: .4s; }
+    .delay-5 { animation-delay: .5s; }
+    .delay-6 { animation-delay: .6s; }
+    .delay-7 { animation-delay: .7s; }
+  </style>
+</head>
+<body class="min-h-screen font-outfit bg-surface text-on-surface">
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- MOBILE HEADER                                           -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <header class="lg:hidden fixed top-0 left-0 right-0 z-50 px-4 py-3 flex items-center gap-3" style="background:rgba(248,249,255,.85);backdrop-filter:blur(14px);border-bottom:1px solid rgba(196,198,208,.4)">
+    <div class="w-9 h-9 rounded-full bg-white flex items-center justify-center p-0.5 shadow border border-outline-variant/30">
+      <img src="images/02_palamuru_university_logo.png" alt="Palamuru University Logo" class="w-full h-full object-contain" />
+    </div>
+    <div>
+      <span class="font-playfair font-bold text-primary text-sm leading-tight block">University Portal</span>
+      <span class="text-[10px] text-on-surface-variant font-medium tracking-wide">PALAMURU UNIVERSITY</span>
+    </div>
+  </header>
+
+  <div class="flex min-h-screen">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- LEFT PANEL — Branding (hidden on mobile)               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="hidden lg:flex lg:w-[48%] xl:w-[52%] login-bg relative flex-col justify-between p-12 xl:p-16 overflow-hidden">
+      <!-- Particles -->
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+
+      <!-- Top branding -->
+      <div class="relative z-10 animate-fsu">
+        <div class="flex items-center gap-4 mb-2">
+          <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center p-1 shadow-lg border-2 border-white/20">
+            <img src="images/02_palamuru_university_logo.png" alt="Palamuru University Logo" class="w-full h-full object-contain" />
+          </div>
+          <div>
+            <h2 class="font-playfair text-white text-xl font-bold tracking-tight">Palamuru University</h2>
+            <p class="text-blue-200 text-xs font-medium tracking-widest uppercase">Attendance Portal</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center tagline -->
+      <div class="relative z-10 animate-fsu delay-2">
+        <h1 class="font-playfair text-white text-4xl xl:text-5xl font-bold leading-tight mb-5">
+          Empowering the Future,<br/>
+          <span class="text-transparent bg-clip-text" style="background-image:linear-gradient(135deg,#ffe170,#ffd740)">Honoring the Past</span>
+        </h1>
+        <p class="text-blue-200/80 text-base max-w-md leading-relaxed">
+          A secure, modern attendance management system designed for streamlined academic operations.
+        </p>
+      </div>
+
+      <!-- Bottom badges -->
+      <div class="relative z-10 flex items-center gap-3 animate-fsu delay-4">
+        <div class="security-badge" style="background:rgba(255,255,255,.1);color:#d4e3ff;border:1px solid rgba(255,255,255,.12)">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">lock</span>
+          Secure 256-bit
+        </div>
+        <div class="security-badge" style="background:rgba(255,255,255,.1);color:#ffe170;border:1px solid rgba(255,255,255,.12)">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">admin_panel_settings</span>
+          Private RBAC
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- RIGHT PANEL — Login Form                               -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="flex-1 flex items-center justify-center px-5 py-24 lg:py-8 lg:px-12 bg-surface-container-low relative overflow-hidden">
+      <!-- Subtle decorative circles -->
+      <div class="absolute -top-20 -right-20 w-72 h-72 rounded-full" style="background:radial-gradient(circle,rgba(0,51,102,.04),transparent 70%)"></div>
+      <div class="absolute -bottom-16 -left-16 w-56 h-56 rounded-full" style="background:radial-gradient(circle,rgba(112,93,0,.04),transparent 70%)"></div>
+
+      <div class="w-full max-w-md relative z-10">
+
+        <!-- Glass card -->
+        <div class="glass-card rounded-3xl p-8 sm:p-10 shadow-xl shadow-primary/5 animate-fsu delay-1">
+
+          <!-- Heading -->
+          <div class="text-center mb-7 animate-fsu delay-2">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4" style="background:linear-gradient(135deg,#003366,#1f477b);box-shadow:0 4px 16px rgba(0,51,102,.25)">
+              <span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings:'FILL' 1">school</span>
+            </div>
+            <h1 class="font-playfair text-2xl sm:text-3xl font-bold text-on-primary-container tracking-tight">Welcome Back</h1>
+            <p class="text-on-surface-variant text-sm mt-1.5 font-medium">Sign in to your university portal</p>
+          </div>
+
+          <!-- Role Tabs -->
+          <div class="role-tabs flex mb-6 animate-fsu delay-3" id="roleTabs">
+            <div class="role-slider" id="roleSlider"></div>
+            <button type="button" class="role-tab active" id="tabStudent" onclick="selectRole('STUDENT')">
+              <span class="material-symbols-outlined text-base align-middle mr-1" style="font-size:18px">school</span> Students
+            </button>
+            <button type="button" class="role-tab" id="tabFaculty" onclick="selectRole('FACULTY')">
+              <span class="material-symbols-outlined text-base align-middle mr-1" style="font-size:18px">person</span> Faculty
+            </button>
+          </div>
+
+          <!-- Error Alert -->
+          <div class="error-alert mb-4" id="errorAlert">
+            <span class="material-symbols-outlined text-lg" style="color:#ba1a1a;font-variation-settings:'FILL' 1">error</span>
+            <span id="errorMsg">Invalid credentials</span>
+          </div>
+
+          <!-- Form -->
+          <form id="loginForm" autocomplete="on">
+            <!-- Email -->
+            <div class="input-group mb-4 animate-fsu delay-4">
+              <input type="email" id="emailInput" placeholder="Email address" required autocomplete="email" aria-label="Email address" />
+              <span class="material-symbols-outlined input-icon">mail</span>
+            </div>
+
+            <!-- Password -->
+            <div class="input-group mb-4 animate-fsu delay-5">
+              <input type="password" id="passwordInput" placeholder="Password" required autocomplete="current-password" aria-label="Password" />
+              <span class="material-symbols-outlined input-icon">lock</span>
+              <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password visibility" onclick="togglePassword()">
+                <span class="material-symbols-outlined">visibility_off</span>
+              </button>
+            </div>
+
+            <!-- Remember + Forgot -->
+            <div class="flex items-center justify-between mb-6 animate-fsu delay-5">
+              <label class="flex items-center gap-2 cursor-pointer select-none" id="rememberLabel">
+                <input type="checkbox" id="rememberMe" class="w-4 h-4 rounded accent-primary cursor-pointer" />
+                <span class="text-sm text-on-surface-variant font-medium">Remember me</span>
+              </label>
+              <a href="#" class="text-sm font-semibold text-primary hover:text-primary/80 transition-colors" id="forgotPwLink">Forgot Password?</a>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn-login animate-fsu delay-6" id="loginBtn">
+              <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1" id="btnIcon">shield</span>
+              <span id="btnText">Secure Login</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Security Footer -->
+        <div class="flex items-center justify-center gap-4 mt-6 animate-fsu delay-7">
+          <div class="security-badge text-on-surface-variant" style="background:rgba(0,51,102,.06);border:1px solid rgba(0,51,102,.08)">
+            <span class="material-symbols-outlined text-sm text-primary" style="font-variation-settings:'FILL' 1">encrypted</span>
+            Encrypted Security
+          </div>
+          <div class="security-badge text-on-surface-variant" style="background:rgba(112,93,0,.06);border:1px solid rgba(112,93,0,.08)">
+            <span class="material-symbols-outlined text-sm text-secondary" style="font-variation-settings:'FILL' 1">verified_user</span>
+            Role-Based Auth
+          </div>
+        </div>
+
+        <!-- Back link -->
+        <div class="text-center mt-5 animate-fsu delay-7">
+          <a href="/index.html" class="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors" id="backHomeLink">
+            <span class="material-symbols-outlined text-lg">arrow_back</span>
+            Back to Home
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- FORGOT PASSWORD MODAL                                    -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="forgotPasswordModal" class="fixed inset-0 z-[150] bg-primary/40 backdrop-blur-sm flex items-center justify-center hidden" onclick="closeForgotModal(event)">
+    <div id="forgotModalBox" class="glass-card rounded-3xl p-8 sm:p-10 w-full max-w-md mx-4 shadow-2xl relative overflow-hidden" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="font-playfair text-xl sm:text-2xl font-bold text-on-primary-container">Reset Password</h3>
+        <button onclick="closeForgotModal()" class="text-on-surface-variant hover:text-error transition-colors" aria-label="Close modal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Step 1: Send OTP -->
+      <div id="forgotStep1">
+        <p class="text-sm text-on-surface-variant font-medium mb-5 leading-relaxed">
+          Enter your registered email address below. We will generate a secure 6-digit OTP verification code to reset your password.
+        </p>
+        <form id="forgotOtpForm" onsubmit="sendResetOtp(event)">
+          <div class="input-group mb-5">
+            <input type="email" id="forgotEmail" placeholder="Email address" required class="w-full" aria-label="Email address" />
+            <span class="material-symbols-outlined input-icon">mail</span>
+          </div>
+          <button type="submit" id="sendOtpBtn" class="btn-login font-bold w-full">
+            <span class="material-symbols-outlined text-xl">send</span> Send OTP
+          </button>
+        </form>
+      </div>
+
+      <!-- Step 2: Verify OTP & Change Password -->
+      <div id="forgotStep2" class="hidden">
+        <p class="text-sm text-on-surface-variant font-medium mb-5 leading-relaxed">
+          An OTP verification code has been generated. Enter the code and your new password below.
+        </p>
+        <form id="forgotResetForm" onsubmit="submitNewPassword(event)">
+          <div class="input-group mb-4">
+            <input type="text" id="resetOtpCode" placeholder="6-digit OTP code" required minlength="6" maxlength="6" pattern="\d{6}" class="w-full" aria-label="OTP verification code" />
+            <span class="material-symbols-outlined input-icon">pin</span>
+          </div>
+          <div class="input-group mb-5">
+            <input type="password" id="resetNewPassword" placeholder="New password" required class="w-full" aria-label="New password" />
+            <span class="material-symbols-outlined input-icon">lock</span>
+          </div>
+          <button type="submit" id="resetPassBtn" class="btn-login font-bold w-full">
+            <span class="material-symbols-outlined text-xl">vpn_key</span> Reset Password
+          </button>
+        </form>
+      </div>
+
+      <!-- Error Message -->
+      <div id="forgotErrorAlert" class="error-alert mt-4">
+        <span class="material-symbols-outlined text-lg" style="color:#ba1a1a;font-variation-settings:'FILL' 1">error</span>
+        <span id="forgotErrorMsg">Error message</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TOAST NOTIFICATION                                      -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="toast" id="toastEl">
+    <span class="material-symbols-outlined text-2xl" id="toastIcon" style="font-variation-settings:'FILL' 1">info</span>
+    <span id="toastMsg">Notification</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SCRIPTS                                                 -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <script src="js/api.js"></script>
+  <script>
+    // ── State ─────────────────────────────────────────────────
+    let selectedRole = 'STUDENT';
+
+    // ── DOM refs ──────────────────────────────────────────────
+    const form        = document.getElementById('loginForm');
+    const emailInput  = document.getElementById('emailInput');
+    const pwInput     = document.getElementById('passwordInput');
+    const loginBtn    = document.getElementById('loginBtn');
+    const btnText     = document.getElementById('btnText');
+    const btnIcon     = document.getElementById('btnIcon');
+    const errorAlert  = document.getElementById('errorAlert');
+    const errorMsg    = document.getElementById('errorMsg');
+    const tabStudent  = document.getElementById('tabStudent');
+    const tabFaculty  = document.getElementById('tabFaculty');
+    const roleSlider  = document.getElementById('roleSlider');
+    const toastEl     = document.getElementById('toastEl');
+    const toastIcon   = document.getElementById('toastIcon');
+    const toastMsg    = document.getElementById('toastMsg');
+
+    // ── Role selection ────────────────────────────────────────
+    function selectRole(role) {
+      selectedRole = role;
+      if (role === 'STUDENT') {
+        tabStudent.classList.add('active');
+        tabFaculty.classList.remove('active');
+        roleSlider.classList.remove('right');
+      } else {
+        tabFaculty.classList.add('active');
+        tabStudent.classList.remove('active');
+        roleSlider.classList.add('right');
+      }
+    }
+
+    // ── Pre-select via URL param ──────────────────────────────
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('role') === 'faculty') selectRole('FACULTY');
+
+    // ── Toggle password visibility ────────────────────────────
+    function togglePassword() {
+      const btn = document.getElementById('togglePw');
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (pwInput.type === 'password') {
+        pwInput.type = 'text';
+        icon.textContent = 'visibility';
+      } else {
+        pwInput.type = 'password';
+        icon.textContent = 'visibility_off';
+      }
+    }
+
+    // ── Toast helper ──────────────────────────────────────────
+    let toastTimer;
+    function showToast(msg, type = 'info') {
+      const colors = { success: '#16a34a', error: '#ba1a1a', info: '#003366', warning: '#705d00' };
+      const icons  = { success: 'check_circle', error: 'error', info: 'info', warning: 'warning' };
+      toastIcon.textContent = icons[type] || 'info';
+      toastIcon.style.color = colors[type] || '#003366';
+      toastMsg.textContent  = msg;
+      toastEl.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove('show'), 4000);
+    }
+
+    // ── Show / hide error ─────────────────────────────────────
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorAlert.classList.add('visible');
+    }
+    function hideError() {
+      errorAlert.classList.remove('visible');
+    }
+
+    // ── Set loading state ─────────────────────────────────────
+    function setLoading(loading) {
+      loginBtn.disabled = loading;
+      if (loading) {
+        btnText.textContent = 'Signing in…';
+        btnIcon.style.display = 'none';
+        const sp = document.createElement('div');
+        sp.className = 'spinner';
+        sp.id = 'btnSpinner';
+        loginBtn.prepend(sp);
+      } else {
+        btnText.textContent = 'Secure Login';
+        btnIcon.style.display = '';
+        const sp = document.getElementById('btnSpinner');
+        if (sp) sp.remove();
+      }
+    }
+
+    // ── Form submit ───────────────────────────────────────────
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideError();
+
+      const email    = emailInput.value.trim();
+      const password = pwInput.value;
+
+      if (!email || !password) {
+        showError('Please fill in all fields.');
+        showToast('Missing credentials', 'warning');
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || 'Login failed. Please check your credentials.');
+        }
+
+        // ── Success ─────────────────────────────────────────
+        localStorage.setItem('pu_token', data.token);
+        localStorage.setItem('pu_user', JSON.stringify(data.user));
+
+        showToast('Login successful! Redirecting…', 'success');
+
+        // Short delay so the user sees the toast
+        setTimeout(() => {
+          const role = (data.user && data.user.role) || selectedRole;
+          if (role === 'STUDENT') {
+            window.location.href = '/student-dashboard.html';
+          } else {
+            window.location.href = '/faculty-dashboard.html';
+          }
+        }, 800);
+
+      } catch (err) {
+        setLoading(false);
+        showError(err.message || 'Something went wrong.');
+        showToast(err.message || 'Login failed', 'error');
+      }
+    });
+
+    // ── Forgot Password Modal Handlers ────────────────────────
+    const forgotModal     = document.getElementById('forgotPasswordModal');
+    const forgotStep1     = document.getElementById('forgotStep1');
+    const forgotStep2     = document.getElementById('forgotStep2');
+    const forgotEmail     = document.getElementById('forgotEmail');
+    const resetOtpCode    = document.getElementById('resetOtpCode');
+    const resetNewPassword = document.getElementById('resetNewPassword');
+    const forgotErrorAlert = document.getElementById('forgotErrorAlert');
+    const forgotErrorMsg   = document.getElementById('forgotErrorMsg');
+    const forgotPwLink    = document.getElementById('forgotPwLink');
+
+    forgotPwLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      openForgotModal();
+    });
+
+    function openForgotModal() {
+      forgotStep1.classList.remove('hidden');
+      forgotStep2.classList.add('hidden');
+      forgotEmail.value = '';
+      resetOtpCode.value = '';
+      resetNewPassword.value = '';
+      forgotErrorAlert.classList.remove('visible');
+      forgotModal.classList.remove('hidden');
+    }
+
+    function closeForgotModal(e) {
+      if (e && e.target !== forgotModal) return;
+      forgotModal.classList.add('hidden');
+    }
+
+    function showForgotError(msg) {
+      forgotErrorMsg.textContent = msg;
+      forgotErrorAlert.classList.add('visible');
+    }
+
+    async function sendResetOtp(e) {
+      e.preventDefault();
+      forgotErrorAlert.classList.remove('visible');
+      const email = forgotEmail.value.trim();
+      if (!email) return;
+
+      const btn = document.getElementById('sendOtpBtn');
+      btn.disabled = true;
+      const origText = btn.innerHTML;
+      btn.textContent = 'Sending OTP…';
+
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to send OTP.');
+
+        showToast('OTP code printed to server console logs!', 'success');
+        forgotStep1.classList.add('hidden');
+        forgotStep2.classList.remove('hidden');
+      } catch(err) {
+        showForgotError(err.message);
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
+
+    async function submitNewPassword(e) {
+      e.preventDefault();
+      forgotErrorAlert.classList.remove('visible');
+      const email = forgotEmail.value.trim();
+      const otp = resetOtpCode.value.trim();
+      const newPassword = resetNewPassword.value;
+
+      if (!email || !otp || !newPassword) return;
+
+      const btn = document.getElementById('resetPassBtn');
+      btn.disabled = true;
+      const origText = btn.innerHTML;
+      btn.textContent = 'Updating password…';
+
+      try {
+        const res = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp, newPassword })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Reset failed.');
+
+        showToast('Password reset successful! Ready to login.', 'success');
+        forgotModal.classList.add('hidden');
+        
+        // Auto-fill login fields for convenience
+        emailInput.value = email;
+        pwInput.value = newPassword;
+      } catch(err) {
+        showForgotError(err.message);
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+    }
+  </script>
+</body>
+</html>
