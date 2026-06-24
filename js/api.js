@@ -1,8 +1,10 @@
-// ============================================================
-// Palamuru University Portal — Shared API Utility
-// Same-origin: backend + frontend served from the same server
-// ============================================================
-const API_BASE = '/api';
+// ── API Base URL ─────────────────────────────────────────────────────────────
+// When served from Render (same origin), use /api.
+// When served from Netlify or any other CDN, point to the Render backend URL.
+const RENDER_BACKEND_URL = 'https://palamuru-attendance.onrender.com'; // ← Update after Render deploy
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const isSameOriginRender = window.location.hostname.includes('onrender.com');
+const API_BASE = (isLocalhost || isSameOriginRender) ? '/api' : `${RENDER_BACKEND_URL}/api`;
 
 const PU = {
   // ── Auth ──────────────────────────────────────────────────
@@ -27,7 +29,11 @@ const PU = {
 
   // ── HTTP helpers ──────────────────────────────────────────
   async request(path, opts = {}) {
-    const headers = { 'Content-Type': 'application/json', ...opts.headers };
+    const headers = { 
+      'Content-Type': 'application/json', 
+      'Bypass-Tunnel-Reminder': 'true',
+      ...opts.headers 
+    };
     const token = this.getToken();
     if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(`${API_BASE}${path}`, { ...opts, headers });
