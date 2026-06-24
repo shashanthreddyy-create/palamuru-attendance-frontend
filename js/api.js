@@ -1,7 +1,7 @@
 // ── API Base URL ─────────────────────────────────────────────────────────────
 // When served from Render (same origin), use /api.
 // When served from Netlify or any other CDN, point to the Render backend URL.
-const RENDER_BACKEND_URL = 'https://palamuru-attendance.onrender.com'; // ← Update after Render deploy
+const RENDER_BACKEND_URL = 'https://palamuru-university-portal.loca.lt'; // localtunnel // ← Update after Render deploy
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const isSameOriginRender = window.location.hostname.includes('onrender.com');
 const API_BASE = (isLocalhost || isSameOriginRender) ? '/api' : `${RENDER_BACKEND_URL}/api`;
